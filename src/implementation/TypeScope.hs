@@ -3,70 +3,97 @@ module TypeScope where
 import LangDef
 import Data.Maybe
 
-data VarList = VarList [VarElem] deriving (Eq, Show)
-data VarElem = Var String VarType
-             | VarScope VarList deriving (Eq, Show)
-
-data UpdateRes = Success VarList | Fail deriving (Eq, Show)
+data VarScope = VarScope VarScope [ElemVar]
+              | NullScope deriving (Eq, Show)
+data ElemVar = ElemVar String VarType
+             | ElemScope VarScope deriving (Eq, Show)
 
 -- Check Type and Scope
-check :: [Stmt] -> Bool
-check stmts = checkTypeScope stmts (VarList [])
-checkTypeScope :: [Stmt] -> VarList -> Bool
-checkTypeScope [] _ = True
-checkTypeScope (x:y) currentList = case (update x currentList) of (Success list) -> checkTypeScope y list
-                                                                  Fail -> False
 
-update :: Stmt -> VarList -> UpdateRes
-update stmt list = case stmt of VarDecStmt varDec -> updateVarDeclare varDec list
-                                VarReDecStmt varReDec -> updateVarReDeclare varReDec list
-                                LockStmt lock -> undefined
-                                ThreadStmt thread -> undefined
-                                WheStmt wheStmt -> updateWhere stmt list
-                                IfStmt ifStmt -> updateIf stmt list
+buildTypeScopeProg :: Program -> VarScope
+buildTypeScopeProg (Program stmts) = buildTypeScope (VarScope NullScope []) stmts
 
-updateVarDeclare :: VarDec -> VarList -> UpdateRes
-updateVarDeclare (VarDec varType varName _) (VarList list) = if (varExisted list varName)
-  then Fail else Success (VarList (list ++ [Var varName varType]))
+buildTypeScope :: VarScope -> [Stmt] -> VarScope
+buildTypeScope buildingScope [] = buildingScope
+buildTypeScope buildingScope (x:y) = buildTypeScope (processElemToScope x buildingScope) y
 
-updateVarReDeclare :: VarReDec -> VarList -> UpdateRes
-updateVarReDeclare (VarReDec varName newValue) (VarList list) = case (varExistedAndVal list varName) of
-                  | Nothing - Fail
-                  | otherwise = Fail
+processElemToScope :: Stmt -> VarScope -> VarScope
+processElemToScope stmt buildingScope =
+  case stmt of (VarDecStmt varDec) -> processVarDec varDec buildingScope
+               (VarReDecStmt varReDec) -> processVarReDec varReDec buildingScope
+               (WheStmt whereStmt) -> processWhere whereStmt buildingScope
+               (IfStmt ifStmt) -> processIf ifStmt buildingScope
+               (ThreadStmt _) -> buildingScope
+               (LockStmt _) -> buildingScope
 
-updateWhere :: Stmt -> VarList -> UpdateRes
-updateWhere stmt list = undefined
+processIf :: If -> VarScope -> VarScope
+processIf ifStmt scope =
+  case ifStmt of (IfOne expr s1 s2) -> validCond expr scope (scpa (scpa scope s1) s2)
+                 (IfTwo expr s) -> validCond expr scope (scpa scope s)
 
-updateIf :: Stmt -> VarList -> UpdateRes
-updateIf stmt list = undefined
+processWhere :: Where -> VarScope -> VarScope
+processWhere (Where condition s) scope = validCond condition scope (scpa scope s)
 
--- This function is used to build the list
-varExisted :: [VarElem] -> String -> Bool
-varExisted list var = isJust (varExistedAndVal list var)
-varExistedAndVal :: [VarElem] -> String -> Maybe VarElem -- Current List -> Variable name -> Existed inside its scope
-varExistedAndVal [] _ = Nothing
-varExistedAndVal (x:y) var = case x of (VarScope _) -> next
-                                       (Var name varType) -> if (name == var) then (Just (Var name varType)) else next
-    where next = varExistedAndVal y var
+processVarReDec :: VarReDec -> VarScope -> VarScope
+processVarReDec (VarReDec varName newVal) scope = if (getType (VarExp varName) scope) == (getTypeV newVal scope)
+  then scope else error ("Invalid variable type redeclaring: " ++ varName)
+
+processVarDec :: VarDec -> VarScope -> VarScope
+processVarDec (VarDec elemType elemName elemVal) (VarScope motherScope elems)
+  | existedInScope elemName elems = error (elemName ++ " already existed!!") -- Check if variable already declared inside a scope
+  | (getTypeV elemVal (VarScope motherScope elems)) /= elemType = error (elemName ++ " has invalid type: " ++ (show elemType)) -- Check if valid type
+  | otherwise = addToScope (ElemVar elemName elemType) (VarScope motherScope elems)
+
+-- Scope Helper
+addToScope :: ElemVscpaar -> VarScope -> VarScope
+addToScope x NullScope = VarScope NullScope [x]
+addToScope x (VarScope y z) = VarScope y (z ++ [x])
+
+existedInScope :: String -> [ElemVar] -> Bool
+existedInScope _ [] = False
+existedInScope varName (x:y) = case x of (ElemScope _) -> existedNext
+                                         (ElemVar name _) -> if (name == varName) then True else existedNext
+                               where existedNext = existedInScope varName y
+
+validCond :: Expr -> VarScope -> a -> a
+validCond cond scope x | (getTypeV cond scope) /= Boo = error ("Invalid type (Require BOO): " ++ (show cond))
+                       | otherwise = x
+
+scpa :: VarScope -> Scope -> VarScope -- scope add
+scpa scope (Scope stmts) = addToScope (ElemScope (buildTypeScope (VarScope scope []) stmts)) scope
 
 -- Check type
-getType :: Expr -> VarType
-getType x = case x of (NumExp _) -> Num
-                      -- (VarExp _) -> TODO: Check var type
-                      (BooExp _) -> Boo
-                      (NumCalc _ _ _) -> Num
-                      (BooCalc _ _ _) -> Boo
-                      (Cond _) -> Boo
-isValidCond :: Condition -> Bool
-isValidCond = undefined
-isValidType :: Expr -> Bool
-isValidType x = case x of (NumExp _) -> True
-                          -- (VarExp _) -> TODO: Check var type
-                          (BooExp _) -> True
-                          (NumCalc ex1 _ ex2) -> isNum ex1 && isNum ex2
-                          (Cond condition) -> isValidCond condition
-                          (BooCalc ex1 _ ex2) -> isBoo ex1 && isBoo ex2
-isNum :: Expr -> Bool
-isNum x = (getType x) == Num
-isBoo :: Expr -> Bool
-isBoo x = (getType x) == Boo
+getType :: Expr -> VarScope -> VarType
+getType x currentScope = case x of (NumExp _) -> Num
+                                   (VarExp varName) -> (\(ElemVar _ varType) -> varType) (findElem varName currentScope)
+                                   (BooExp _) -> Boo
+                                   (NumCalc _ _ _) -> Num
+                                   (BooCalc _ _ _) -> Boo
+                                   (CondExp _ _ _) -> Boo
+getTypeV :: Expr -> VarScope -> VarType
+getTypeV x scope = case x of (NumExp _) -> Num
+                             (VarExp varName) -> (\(ElemVar _ varType) -> varType) (findElem varName scope)
+                             (BooExp _) -> Boo
+                             (NumCalc _ _ _) -> Num
+                             (BooCalc _ _ _) -> Boo
+                             (CondExp _ _ _) -> Boo
+
+findElem :: String -> VarScope -> ElemVar
+findElem elem NullScope = error ("Cannot find elem " ++ elem)
+findElem elem (VarScope NullScope []) = error ("Cannot find elem " ++ elem)
+findElem elem (VarScope motherScope []) = findElem elem motherScope
+findElem elem (VarScope motherScope (x:y)) =
+    case x of (ElemVar name varType) -> if (elem == name) then (ElemVar name varType) else findNext
+              (ElemScope _) -> findNext
+    where findNext = findElem elem (VarScope motherScope y)
+
+validType :: Expr -> VarScope -> a -> a
+validType x scope value = case x of (NumExp _) -> value
+                                    (VarExp _) -> value
+                                    (BooExp _) -> value
+                                    (NumCalc ex1 _ ex2) -> isNum ex1 (isNum ex2 value)
+                                    (CondExp ex1 _ ex2) -> isNum ex1 (isNum ex2 value)
+                                    (BooCalc ex1 _ ex2) -> isBoo ex1 (isBoo ex2 value)
+                          where isNum x = valid (getTypeV x scope) Num
+                                isBoo x = valid (getTypeV x scope) Boo
+                                valid type1 type2 val = if (type1 == type2) then val else error "Incorrect type"

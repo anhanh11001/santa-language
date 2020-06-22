@@ -3,6 +3,7 @@ module BParser where
 import LangDef
 import PComb
 import Text.ParserCombinators.Parsec
+import TypeScope
 
 transform :: String -> a -> Parser a
 transform x f = (\m -> f) <$> symbol x
@@ -140,4 +141,4 @@ compile x = (\(Right x) -> x) (parse program "Error" x)
 
 main = do
   s <- readFile "simple_prog.txt"
-  return (compile s)
+  return (buildTypeScopeProg (compile s))

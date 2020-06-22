@@ -13,8 +13,8 @@
     <list default="true" id="05d4008b-1853-498c-9879-6b49e7e2974a" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/implementation/BParser.hs" beforeDir="false" afterPath="$PROJECT_DIR$/src/implementation/BParser.hs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/implementation/LangDef.hs" beforeDir="false" afterPath="$PROJECT_DIR$/src/implementation/LangDef.hs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/implementation/tests/example.txt" beforeDir="false" afterPath="$PROJECT_DIR$/src/implementation/tests/example.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/implementation/TypeScope.hs" beforeDir="false" afterPath="$PROJECT_DIR$/src/implementation/TypeScope.hs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/implementation/simple_prog.txt" beforeDir="false" afterPath="$PROJECT_DIR$/src/implementation/simple_prog.txt" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -55,6 +55,8 @@
   </component>
   <component name="RecentsManager">
     <key name="MoveFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/src/implementation" />
+      <recent name="$PROJECT_DIR$/src/implementation/tests" />
       <recent name="$PROJECT_DIR$/src/language_definition" />
     </key>
   </component>
@@ -81,7 +83,8 @@
       <workItem from="1592812737001" duration="5339000" />
       <workItem from="1592824680640" duration="2972000" />
       <workItem from="1592829856899" duration="84000" />
-      <workItem from="1592830065031" duration="1149000" />
+      <workItem from="1592830065031" duration="9707000" />
+      <workItem from="1592843726442" duration="1574000" />
     </task>
     <servers />
   </component>
@@ -113,9 +116,9 @@
       <screen x="0" y="23" width="1680" height="953" />
     </state>
     <state x="361" y="0" width="696" height="677" key="dock-window-1/0.23.1680.953@0.23.1680.953" timestamp="1592663831747" />
-    <state x="505" y="233" width="670" height="676" key="search.everywhere.popup" timestamp="1592818179562">
+    <state x="505" y="233" width="670" height="676" key="search.everywhere.popup" timestamp="1592844657664">
       <screen x="0" y="0" width="1680" height="1050" />
     </state>
-    <state x="505" y="233" width="670" height="676" key="search.everywhere.popup/0.0.1680.1050@0.0.1680.1050" timestamp="1592818179562" />
+    <state x="505" y="233" width="670" height="676" key="search.everywhere.popup/0.0.1680.1050@0.0.1680.1050" timestamp="1592844657664" />
   </component>
 </project>
