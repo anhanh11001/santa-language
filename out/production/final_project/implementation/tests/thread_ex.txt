@@ -1,0 +1,19 @@
+santa_lock_create lock;
+
+christmas_create seasonOne {
+    santa_lock lock;
+
+    santa_unlock lock;
+};
+
+christmas_create seasonTwo {
+    santa_lock lock;
+
+    santa_unlock lock;
+};
+
+christmas_start seasonOne;
+christmas_start seasonTwo;
+
+christmas_stop seasonTwo;
+christmas_stop seasonOne;

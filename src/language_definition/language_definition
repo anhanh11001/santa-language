@@ -1,0 +1,47 @@
+Language Definition
+
+Reindeer - function
+Christmas - thread
+
+<program> ::= (<var_declare> | <var_redeclare> | <if> | <where> | <function>)+
+<scope> := (<var_declare> | <var_redeclare> | <if> | <where>)+
+
+<thread_create> ::= 'christmas create' identifier '{' <scope> '};' // identifier = name
+<thread_start> ::= 'christmas start' identifier ';'
+<thread_join> ::= 'christmas stop' identifier ';'
+<lock_create> :: 'santa lock create' identifier ';'
+<lock> ::= 'santa lock' identifier ';'
+<unlock> ::= 'santa unlock' identifier ';'
+
+<function> ::= 'reindeer’ <var_type> identifier (<var_type> identifier)* ’do’ ‘{‘ <scope> ‘}’ ‘;’
+<function_call> ::= 'santa call reindeer' identifier (<expr>)* ;
+
+<var_declare>   ::= ‘santa make gift’ <var_type> identifier ‘=’ <expr> ‘;’
+<var_redeclare> ::= ‘santa change gift’ identifier ‘=’ <expr>;
+
+<if> ::= <if_two> | <if_one>
+<if_two> ::= ‘santa check’ ‘(‘ <condition> ‘)’ ‘then he do’ ‘{‘ <scope> ‘}’ ‘otherwise he do’ ‘{‘ <scope> ‘}’ ‘;’
+<if_one> ::= ‘santa check’ ‘(‘ <condition> ‘)’ ‘then he do’ ‘{‘ <scope> ‘}’ ‘;’
+
+<where> ::= ‘santa go to factory when ’ ‘(‘ <condition> ‘)’ ‘{‘ <scope> ‘}’ ‘;’
+
+<var_type> ::= ‘num’ | ’bool’ | ‘char’ | ‘str’ | … (think about array later)
+<array> ::= TODO
+
+<expr> := integer            		-> number
+        |  identifier			    -> variable
+        |  ‘true’ | ‘false’		    -> bool
+        |  ‘”’ identifier ‘“’ 	    -> string
+        |  <condition>		        -> any, depends on type support: bool and integer only
+        |  <array>			        -> array
+        |  <calculation>		    -> any depends on type support: integer only
+        |  <bool_comp>              -> bool
+        |  <function_call>
+
+<calculation> := <expr> <calc_op> <expr>
+<condition> ::= <expr> <ordering> <expr>
+<bool_comp> ::= <expr> <bool_op> <expr>
+
+<bool_op> ::= ‘||’ | ‘&&’
+<ordering> ::= ‘<‘ | ‘==‘ | ‘>’ | '>=' | '<='
+<calc_op> ::= ‘+’ | ‘-‘ |  ‘*’ | ‘/‘

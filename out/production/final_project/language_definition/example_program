@@ -1,0 +1,52 @@
+// Note: '//' is just a comment for this example, not a real comment in the language definition
+
+// Declare and redeclare variable
+santa make gift a = 12;
+santa make gift b = true;
+santa make gift c = "hello";
+santa change gift c = "hello world";
+
+// if, where statement
+santa check (a >= 11) then he do {
+    santa make gift a = 0;
+    santa go to factory when (a < 5) {
+        santa make gift someRandomGift = true && false;
+        santa change gift a = a + 1;
+    };
+} otherwise he do {
+    santa make gift b = false;
+    santa check (b) then he do {
+        santa make gift c = 22;
+    };
+};
+
+// functions
+reindeer num addNumber (num m, num n) that do {
+    santa make gift res = m + n;
+    return res;
+};
+santa change gift a = santa call reindeer addNumber (1, 2);
+
+// threadings
+santa make gift sum = 0;
+santa lock create sumLock;
+
+christmas create addToSum {
+    santa make gift i = 0;
+    santa go to factory when (i < 100) {
+        santa lock sumLock;
+        santa change gift sum = sum + 5;
+        santa unlock sumLock;
+    };
+};
+christmas start addToSum;
+
+santa make gift i = 0;
+santa go to factory when (i < 100) {
+    santa lock sumLock;
+    santa change gift sum = sum + 5;
+    santa unlock sumLock;
+};
+
+christmas stop addToSum;
+// After this, sum should be 1000 now
