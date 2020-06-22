@@ -24,36 +24,51 @@ boolOp' = transform "&&" And
 ordOp :: Parser OrdOp
 ordOp = spaces >> ordOp' <?> "Fail on ordOp"
 ordOp' :: Parser OrdOp
-ordOp' = transform "<" L
+ordOp' = try (transform "<=" LE)
+     <|> try (transform ">=" ME)
+     <|> try (transform "==" E)
+     <|> transform "<" L
      <|> transform ">" M
-     <|> transform "==" E
-     <|> transform "<=" LE
-     <|> transform ">=" ME
      <|> transform "!=" NE
 
-
-condition :: Parser Condition
-condition = Condition <$> expr <*> ordOp <*> expr
+condition :: Parser Expr
+condition = try (BooCalc <$> term <*> boolOp <*> expr)
+         <|> try (CondExp <$> factor <*> ordOp <*> term)
+         <|> try (BooExp <$> (transform "true" True <|> transform "false" False))
+         <|> try (VarExp <$> identifier)
+         <|> Parens <$> (parens condition)
          <?> "Fail on condition"
 
 expr :: Parser Expr
 expr = spaces >> expr' <?> "Fail on expr"
-
 expr' :: Parser Expr
-expr' = NumExp <$> integer
-    <|> Cond <$> condition
-    <|> NumCalc <$> expr <*> calcOp <*> expr
-    <|> BooExp <$> (transform "true" True <|> transform "false" False)
-    <|> BooCalc <$> expr <*> boolOp <*> expr
-    <|> VarExp <$> identifier
-    <|> Parens <$> parens expr
+expr' = try (BooCalc <$> term <*> boolOp <*> expr)
+    <|> term3
+
+term3 :: Parser Expr 
+term3 = try (CondExp <$>  term2 <*> ordOp <*> term3)
+     <|> term2
+     
+term2 :: Parser Expr
+term2 = try (NumCalc <$> term <*> (add <|> sub) <*> term2)
+     <|> term
+
+term :: Parser Expr
+term = try (NumCalc <$> factor <*> (mul <|> divOp) <*> term)
+    <|> factor
+
+factor :: Parser Expr
+factor = NumExp <$> integer
+      <|> Parens <$> parens expr
+      <|> VarExp <$> identifier
+      <|> BooExp <$> (transform "true" True <|> transform "false" False)
 
 ifP :: Parser If
 ifP = spaces >> ifP' <?> "Fail on ifP"
 ifP' :: Parser If
-ifP' = IfOne <$> ((reserved "santa_check") *> (parens condition))
+ifP' = try (IfOne <$> ((reserved "santa_check") *> (parens condition))
              <*> ((reserved "then_he_do") *> (braces scope))
-             <*> ((reserved "otherwise_he_do") *> (braces scope))
+             <*> ((reserved "otherwise_he_do") *> (braces scope)))
    <|> IfTwo <$> ((reserved "santa_check") *> (parens condition))
              <*> ((reserved "then_he_do") *> (braces scope))
 
@@ -101,15 +116,28 @@ stmt =  VarDecStmt <$> varDec
     <?> "Fail on stmt"
 
 scope :: Parser Scope
-scope = Scope <$> (sepBy stmt (symbol ";")) <?> "Fail on scope"
+scope = Scope <$> (endBy stmt (symbol ";")) <?> "Fail on scope"
 
 program :: Parser Program
-program = Program <$> (sepBy stmt (symbol ";")) <?> "Fail on program"
+program = Program <$> (endBy stmt (symbol ";")) <?> "Fail on program"
 
-calcOp :: Parser CalcOp
-calcOp = spaces >> calcOp' <?> "Fail on calcOp"
-calcOp' :: Parser CalcOp
-calcOp' =  transform "+" Add
-      <|> transform "-" Sub
-      <|> transform "*" Mult
-      <|> transform "/" Div
+calcOp :: String -> Parser CalcOp
+calcOp op = spaces >> (calcOp' op) <?> "Fail on calcOp"
+calcOp' :: String -> Parser CalcOp
+calcOp' op = case op of "+" -> transform op Add
+                        "-" -> transform op Sub
+                        "*" -> transform op Mult
+                        "/" -> transform op Div
+                        otherwise -> error "Invalid operator"
+add = calcOp "+"
+sub = calcOp "-"
+mul = calcOp "*"
+divOp = calcOp "/"
+
+
+compile :: String -> Program
+compile x = (\(Right x) -> x) (parse program "Error" x)
+
+main = do
+  s <- readFile "simple_prog.txt"
+  return (compile s)
