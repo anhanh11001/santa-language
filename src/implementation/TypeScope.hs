@@ -45,7 +45,7 @@ processVarDec (VarDec elemType elemName elemVal) (VarScope motherScope elems)
   | otherwise = addToScope (ElemVar elemName elemType) (VarScope motherScope elems)
 
 -- Scope Helper
-addToScope :: ElemVscpaar -> VarScope -> VarScope
+addToScope :: ElemVar -> VarScope -> VarScope
 addToScope x NullScope = VarScope NullScope [x]
 addToScope x (VarScope y z) = VarScope y (z ++ [x])
 
@@ -74,9 +74,12 @@ getTypeV :: Expr -> VarScope -> VarType
 getTypeV x scope = case x of (NumExp _) -> Num
                              (VarExp varName) -> (\(ElemVar _ varType) -> varType) (findElem varName scope)
                              (BooExp _) -> Boo
-                             (NumCalc _ _ _) -> Num
-                             (BooCalc _ _ _) -> Boo
-                             (CondExp _ _ _) -> Boo
+                             (NumCalc ex1 _ ex2) -> isNum ex1 (isNum ex2 Num)
+                             (BooCalc ex1 _ ex2) -> isBoo ex1 (isBoo ex2 Boo)
+                             (CondExp ex1 _ ex2) -> isNum ex1 (isNum ex2 Boo)
+                   where isNum x = valid (getTypeV x scope) Num
+                         isBoo x = valid (getTypeV x scope) Boo
+                         valid type1 type2 val = if (type1 == type2) then val else error ("Incorrect type" ++ (show x))
 
 findElem :: String -> VarScope -> ElemVar
 findElem elem NullScope = error ("Cannot find elem " ++ elem)
@@ -96,4 +99,4 @@ validType x scope value = case x of (NumExp _) -> value
                                     (BooCalc ex1 _ ex2) -> isBoo ex1 (isBoo ex2 value)
                           where isNum x = valid (getTypeV x scope) Num
                                 isBoo x = valid (getTypeV x scope) Boo
-                                valid type1 type2 val = if (type1 == type2) then val else error "Incorrect type"
+                                valid type1 type2 val = if (type1 == type2) then val else error ("Incorrect type" ++ (show x))

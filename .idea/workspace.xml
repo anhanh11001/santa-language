@@ -12,9 +12,7 @@
   <component name="ChangeListManager">
     <list default="true" id="05d4008b-1853-498c-9879-6b49e7e2974a" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/implementation/BParser.hs" beforeDir="false" afterPath="$PROJECT_DIR$/src/implementation/BParser.hs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/implementation/TypeScope.hs" beforeDir="false" afterPath="$PROJECT_DIR$/src/implementation/TypeScope.hs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/implementation/simple_prog.txt" beforeDir="false" afterPath="$PROJECT_DIR$/src/implementation/simple_prog.txt" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -44,7 +42,7 @@
     <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
     <property name="WebServerToolWindowFactoryState" value="false" />
     <property name="aspect.path.notification.shown" value="true" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/src/sprockell" />
     <property name="node.js.detected.package.eslint" value="true" />
     <property name="node.js.detected.package.tslint" value="true" />
     <property name="node.js.path.for.package.eslint" value="project" />
@@ -54,8 +52,12 @@
     <property name="nodejs_package_manager_path" value="npm" />
   </component>
   <component name="RecentsManager">
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/src/sprockell" />
+    </key>
     <key name="MoveFile.RECENT_KEYS">
       <recent name="$PROJECT_DIR$/src/implementation" />
+      <recent name="$PROJECT_DIR$/src/sprockell" />
       <recent name="$PROJECT_DIR$/src/implementation/tests" />
       <recent name="$PROJECT_DIR$/src/language_definition" />
     </key>
@@ -84,7 +86,10 @@
       <workItem from="1592824680640" duration="2972000" />
       <workItem from="1592829856899" duration="84000" />
       <workItem from="1592830065031" duration="9707000" />
-      <workItem from="1592843726442" duration="1574000" />
+      <workItem from="1592843726442" duration="2051000" />
+      <workItem from="1592884917917" duration="139000" />
+      <workItem from="1592908370882" duration="1958000" />
+      <workItem from="1592910691155" duration="1333000" />
     </task>
     <servers />
   </component>
