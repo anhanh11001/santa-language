@@ -2,11 +2,28 @@ module TypeScope where
 
 import LangDef
 import Data.Maybe
+import Data.List
 
 data VarScope = VarScope VarScope [ElemVar]
               | NullScope deriving (Eq, Show)
 data ElemVar = ElemVar String VarType
              | ElemScope VarScope deriving (Eq, Show)
+
+prettyTypeScope :: VarScope -> String
+prettyTypeScope (VarScope _ elems) = "[ " ++ (intercalate ", " (map prettyElem elems)) ++ " ]"
+
+prettyElem :: ElemVar -> String
+prettyElem elem = case elem of (ElemVar varName varType) -> ((show varType) ++ ": " ++ varName)
+                               (ElemScope scope) -> prettyTypeScope scope
+
+-- Turn all mother scope to null
+simplify :: VarScope -> VarScope
+simplify NullScope = NullScope
+simplify (VarScope _ elem) = VarScope NullScope (map simplify' elem)
+
+simplify' :: ElemVar -> ElemVar
+simplify' x = case x of (ElemVar _ _) -> x
+                        (ElemScope scope) -> ElemScope $ simplify $ scope
 
 -- Check Type and Scope
 

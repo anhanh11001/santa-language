@@ -12,20 +12,9 @@
   <component name="ChangeListManager">
     <list default="true" id="05d4008b-1853-498c-9879-6b49e7e2974a" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/implementation/tests/parser/BoolOp.hs" beforeDir="false" afterPath="$PROJECT_DIR$/src/implementation/tests/parser/unit/BoolOp.hs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/implementation/tests/parser/Expr.hs" beforeDir="false" afterPath="$PROJECT_DIR$/src/implementation/tests/parser/unit/Expr.hs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/implementation/tests/parser/If.hs" beforeDir="false" afterPath="$PROJECT_DIR$/src/implementation/tests/parser/unit/If.hs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/implementation/tests/parser/OrdOp.hs" beforeDir="false" afterPath="$PROJECT_DIR$/src/implementation/tests/parser/unit/OrdOp.hs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/implementation/tests/parser/ThreadLock.hs" beforeDir="false" afterPath="$PROJECT_DIR$/src/implementation/tests/parser/unit/ThreadLock.hs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/implementation/tests/parser/VarDec.hs" beforeDir="false" afterPath="$PROJECT_DIR$/src/implementation/tests/parser/unit/VarDec.hs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/implementation/tests/parser/VarReDec.hs" beforeDir="false" afterPath="$PROJECT_DIR$/src/implementation/tests/parser/unit/VarReDec.hs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/implementation/tests/parser/VarType.hs" beforeDir="false" afterPath="$PROJECT_DIR$/src/implementation/tests/parser/unit/VarType.hs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/implementation/tests/parser/Where.hs" beforeDir="false" afterPath="$PROJECT_DIR$/src/implementation/tests/parser/unit/Where.hs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/implementation/tests/program/Program.hs" beforeDir="false" afterPath="$PROJECT_DIR$/src/implementation/tests/parser/prog/Program.hs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/implementation/tests/program/example.txt" beforeDir="false" afterPath="$PROJECT_DIR$/src/implementation/tests/parser/prog/example.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/implementation/tests/program/flow_control_ex.txt" beforeDir="false" afterPath="$PROJECT_DIR$/src/implementation/tests/parser/prog/flow_control_ex.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/implementation/tests/program/thread_ex.txt" beforeDir="false" afterPath="$PROJECT_DIR$/src/implementation/tests/parser/prog/thread_ex.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/implementation/tests/program/var_ex.txt" beforeDir="false" afterPath="$PROJECT_DIR$/src/implementation/tests/parser/prog/var_ex.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/implementation/BParser.hs" beforeDir="false" afterPath="$PROJECT_DIR$/src/implementation/BParser.hs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/implementation/Main.hs" beforeDir="false" afterPath="$PROJECT_DIR$/src/implementation/Main.hs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/implementation/TypeScope.hs" beforeDir="false" afterPath="$PROJECT_DIR$/src/implementation/TypeScope.hs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -106,7 +95,9 @@
       <workItem from="1592910691155" duration="1333000" />
       <workItem from="1592920270564" duration="7468000" />
       <workItem from="1592962058902" duration="2842000" />
-      <workItem from="1592965473628" duration="10703000" />
+      <workItem from="1592965473628" duration="11786000" />
+      <workItem from="1593000798292" duration="240000" />
+      <workItem from="1593001316450" duration="4280000" />
     </task>
     <servers />
   </component>
@@ -138,10 +129,10 @@
       <screen x="0" y="23" width="1680" height="953" />
     </state>
     <state x="361" y="0" width="696" height="677" key="dock-window-1/0.23.1680.953@0.23.1680.953" timestamp="1592663831747" />
-    <state x="539" y="249" width="715" height="722" key="search.everywhere.popup" timestamp="1592997478940">
+    <state x="539" y="249" width="715" height="722" key="search.everywhere.popup" timestamp="1593008975073">
       <screen x="0" y="0" width="1792" height="1120" />
     </state>
     <state x="505" y="233" width="670" height="676" key="search.everywhere.popup/0.0.1680.1050@0.0.1680.1050" timestamp="1592844657664" />
-    <state x="539" y="249" width="715" height="722" key="search.everywhere.popup/0.0.1792.1120@0.0.1792.1120" timestamp="1592997478940" />
+    <state x="539" y="249" width="715" height="722" key="search.everywhere.popup/0.0.1792.1120@0.0.1792.1120" timestamp="1593008975073" />
   </component>
 </project>

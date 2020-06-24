@@ -138,7 +138,3 @@ divOp = calcOp "/"
 
 compile :: String -> Program
 compile x = (\(Right x) -> x) (parse program "Error" x)
-
-main = do
-  s <- readFile "simple_prog.txt"
-  return (buildTypeScopeProg (compile s))
