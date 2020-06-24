@@ -67,45 +67,45 @@ factor = NumExp <$> integer
 ifP :: Parser If
 ifP = spaces >> ifP' <?> "Fail on ifP"
 ifP' :: Parser If
-ifP' = try (IfOne <$> ((reserved "santa_check") *> (parens condition))
-             <*> ((reserved "then_he_do") *> (braces scope))
-             <*> ((reserved "otherwise_he_do") *> (braces scope)))
-   <|> IfTwo <$> ((reserved "santa_check") *> (parens condition))
-             <*> ((reserved "then_he_do") *> (braces scope))
+ifP' = try (IfOne <$> ((reserved "santa check") *> (parens condition))
+             <*> ((reserved "then he do") *> (braces scope))
+             <*> ((reserved "otherwise he do") *> (braces scope)))
+   <|> IfTwo <$> ((reserved "santa check") *> (parens condition))
+             <*> ((reserved "then he do") *> (braces scope))
 
 whereP :: Parser Where
 whereP = spaces >> whereP' <?> "Fail on whereP"
 whereP' :: Parser Where
-whereP' = Where <$> ((reserved "santa_go_to_factory_when")
+whereP' = Where <$> ((reserved "santa go to factory when")
                 *> (parens condition))
                <*> braces scope
 
 varReDec :: Parser VarReDec
 varReDec = spaces >> varReDec' <?> "Fail on varReDec"
 varReDec' :: Parser VarReDec
-varReDec' = VarReDec <$> ((reserved "santa_change_gift") *> identifier)
+varReDec' = VarReDec <$> ((reserved "santa change gift") *> identifier)
                      <*> (symbol "=" *> expr)
 
 varDec :: Parser VarDec
 varDec = spaces >> varDec'
 varDec' :: Parser VarDec
-varDec' = VarDec <$> ((reserved "santa_make_gift") *> varType)
+varDec' = VarDec <$> ((reserved "santa make gift") *> varType)
                 <*> identifier
                 <*> (symbol "=" *> expr)
 
 lock :: Parser Lock
 lock = spaces >> lock' <?> "Fail on lock"
 lock' :: Parser Lock
-lock' =  LckCreate <$> ((reserved "santa_lock_create") *> identifier)
-    <|> LckLock <$> ((reserved "santa_lock") *> identifier)
-    <|> LckUnlock <$> ((reserved "santa_unlock") *> identifier)
+lock' =  LckCreate <$> ((reserved "santa lock create") *> identifier)
+    <|> LckLock <$> ((reserved "santa lock") *> identifier)
+    <|> LckUnlock <$> ((reserved "santa unlock") *> identifier)
 
 thread :: Parser Thread
 thread = spaces >> thread' <?> "Fail on thread"
 thread' :: Parser Thread
-thread' = ThrCreate <$> (reserved "christmas_create" *> identifier) <*> (braces scope)
-      <|> ThrStart <$> (reserved "christmas_start" *> identifier)
-      <|> ThrStop <$> (reserved "christmas_stop" *> identifier)
+thread' = ThrCreate <$> (reserved "christmas create" *> identifier) <*> (braces scope)
+      <|> ThrStart <$> (reserved "christmas start" *> identifier)
+      <|> ThrStop <$> (reserved "christmas stop" *> identifier)
 
 stmt :: Parser Stmt
 stmt =  VarDecStmt <$> varDec

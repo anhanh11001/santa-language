@@ -1,19 +1,19 @@
-santa_lock_create lock;
+santa lock create lock;
 
-christmas_create seasonOne {
-    santa_lock lock;
+christmas create seasonOne {
+    santa lock lock;
 
-    santa_unlock lock;
+    santa unlock lock;
 };
 
-christmas_create seasonTwo {
-    santa_lock lock;
+christmas create seasonTwo {
+    santa lock lock;
 
-    santa_unlock lock;
+    santa unlock lock;
 };
 
-christmas_start seasonOne;
-christmas_start seasonTwo;
+christmas start seasonOne;
+christmas start seasonTwo;
 
-christmas_stop seasonTwo;
-christmas_stop seasonOne;
+christmas stop seasonTwo;
+christmas stop seasonOne;

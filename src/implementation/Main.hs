@@ -10,5 +10,5 @@ main = do
   let compiledAST = compile prog_stream
   let scopeChecked = buildTypeScopeProg compiledAST -- If this run successfully without raising error, it means that scope checking is successful
   let typeScopePrint = prettyTypeScope scopeChecked
-  return typeScopePrint -- compiled_ast
-
+  return compiledAST
+--  return typeScopePrint -- compiled_ast

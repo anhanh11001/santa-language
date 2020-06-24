@@ -10,7 +10,7 @@ check testName stream res = TestLabel testName (TestCase (
   assertEqual testName (parse whereP "Error" stream) (Right res)))
 
 t1 = check "t1" 
-           "santa_go_to_factory_when (duc == goodStudent) { santa_change_gift a = 13;}"
+           "santa go to factory when (duc == goodStudent) { santa change gift a = 13;}"
            (Where (CondExp (VarExp "duc") E (VarExp "goodStudent"))
                  (Scope [VarReDecStmt (VarReDec "a" (NumExp 13))]))
 

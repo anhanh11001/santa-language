@@ -1,14 +1,14 @@
-santa_make_gift num a = 12;
+santa make gift num a = 12;
 
-santa_check (13 < 14) then_he_do {
-    santa_change_gift a = 13;
-} otherwise_he_do {
-    santa_change_gift a = a * 6;
+santa check (13 < 14) then he do {
+    santa change gift a = 13;
+} otherwise he do {
+    santa change gift a = a * 6;
 };
 
-santa_make_gift num i = 0;
-santa_make_gift num sum = 0;
-santa_go_to_factory_when (i < 100) {
-    santa_change_gift sum = sum + i;
-    santa_change_gift i = i + 1;
+santa make gift num i = 0;
+santa make gift num sum = 0;
+santa go to factory when (i < 100) {
+    santa change gift sum = sum + i;
+    santa change gift i = i + 1;
 };

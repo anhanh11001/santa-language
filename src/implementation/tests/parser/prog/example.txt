@@ -1,44 +1,44 @@
-santa_make_gift num a = 12;
-santa_make_gift bool b = true;
+santa make gift num a = 12;
+santa make gift bool b = true;
 
-santa_check (a >= 11) then_he_do {
-    santa_make_gift num a = 0;
-    santa_go_to_factory_when (a < 5) {
-        santa_make_gift bool someRandomGift = true && false;
-        santa_make_gift num c = 2;
-        santa_change_gift a = a + 1;
-        santa_change_gift c = c * 100;
+santa check (a >= 11) then he do {
+    santa make gift num a = 0;
+    santa go to factory when (a < 5) {
+        santa make gift bool someRandomGift = true && false;
+        santa make gift num c = 2;
+        santa change gift a = a + 1;
+        santa change gift c = c * 100;
     };
-} otherwise_he_do {
-    santa_make_gift num a = 0;
-    santa_make_gift bool b = false;
-    santa_check (b) then_he_do {
-        santa_make_gift num c = 22;
-    };
-};
-
-santa_check (a >= 11) then_he_do {
-    santa_change_gift a = 0;
-};
-
-santa_make_gift num sum = 0;
-santa_lock_create sumLock;
-
-christmas_create addToSum {
-    santa_make_gift num i = 0;
-    santa_go_to_factory_when (i < 100) {
-        santa_lock sumLock;
-        santa_change_gift sum = sum + 5;
-        santa_unlock sumLock;
+} otherwise he do {
+    santa make gift num a = 0;
+    santa make gift bool b = false;
+    santa check (b) then he do {
+        santa make gift num c = 22;
     };
 };
-christmas_start addToSum;
 
-santa_make_gift num i = 0;
-santa_go_to_factory_when (i < 100) {
-    santa_lock sumLock;
-    santa_change_gift sum = sum + 5;
-    santa_unlock sumLock;
+santa check (a >= 11) then he do {
+    santa change gift a = 0;
 };
 
-christmas_stop addToSum;
+santa make gift num sum = 0;
+santa lock create sumLock;
+
+christmas create addToSum {
+    santa make gift num i = 0;
+    santa go to factory when (i < 100) {
+        santa lock sumLock;
+        santa change gift sum = sum + 5;
+        santa unlock sumLock;
+    };
+};
+christmas start addToSum;
+
+santa make gift num i = 0;
+santa go to factory when (i < 100) {
+    santa lock sumLock;
+    santa change gift sum = sum + 5;
+    santa unlock sumLock;
+};
+
+christmas stop addToSum;

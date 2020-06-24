@@ -1,18 +1,18 @@
-santa_make_gift num a = 12;
-santa_make_gift bool b = true;
+santa make gift num a = 12;
+santa make gift bool b = true;
 
-santa_check (a >= 11) then_he_do {
-    santa_make_gift num a = 0;
-    santa_go_to_factory_when (a < 5) {
-        santa_make_gift bool someRandomGift = true && false;
-        santa_make_gift num c = 2;
-        santa_change_gift a = a + 1;
-        santa_change_gift c = c * 100;
+santa check (a >= 11) then he do {
+    santa make gift num a = 0;
+    santa go to factory when (a < 5) {
+        santa make gift bool someRandomGift = true && false;
+        santa make gift num c = 2;
+        santa change gift a = a + 1;
+        santa change gift c = c * 100;
     };
-} otherwise_he_do {
-    santa_make_gift num a = 0;
-    santa_make_gift bool b = false;
-    santa_check (b) then_he_do {
-        santa_make_gift num c = 22;
+} otherwise he do {
+    santa make gift num a = 0;
+    santa make gift bool b = false;
+    santa check (b) then he do {
+        santa make gift num c = 22;
     };
 };
