@@ -12,7 +12,19 @@
   <component name="ChangeListManager">
     <list default="true" id="05d4008b-1853-498c-9879-6b49e7e2974a" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/implementation/TypeScope.hs" beforeDir="false" afterPath="$PROJECT_DIR$/src/implementation/TypeScope.hs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/implementation/BParser.hs" beforeDir="false" afterPath="$PROJECT_DIR$/src/implementation/BParser.hs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/implementation/LangDef.hs" beforeDir="false" afterPath="$PROJECT_DIR$/src/implementation/LangDef.hs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/implementation/tests/unit/BoolOp.hs" beforeDir="false" afterPath="$PROJECT_DIR$/src/implementation/tests/unit/BoolOp.hs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/implementation/tests/unit/Condition.hs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/implementation/tests/unit/Expr.hs" beforeDir="false" afterPath="$PROJECT_DIR$/src/implementation/tests/unit/Expr.hs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/implementation/tests/unit/If.hs" beforeDir="false" afterPath="$PROJECT_DIR$/src/implementation/tests/unit/If.hs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/implementation/tests/unit/OrdOp.hs" beforeDir="false" afterPath="$PROJECT_DIR$/src/implementation/tests/unit/OrdOp.hs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/implementation/tests/unit/Scope.hs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/implementation/tests/unit/ThreadLock.hs" beforeDir="false" afterPath="$PROJECT_DIR$/src/implementation/tests/unit/ThreadLock.hs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/implementation/tests/unit/VarDec.hs" beforeDir="false" afterPath="$PROJECT_DIR$/src/implementation/tests/unit/VarDec.hs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/implementation/tests/unit/VarReDec.hs" beforeDir="false" afterPath="$PROJECT_DIR$/src/implementation/tests/unit/VarReDec.hs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/implementation/tests/unit/VarType.hs" beforeDir="false" afterPath="$PROJECT_DIR$/src/implementation/tests/unit/VarType.hs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/implementation/tests/unit/Where.hs" beforeDir="false" afterPath="$PROJECT_DIR$/src/implementation/tests/unit/Where.hs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -42,7 +54,7 @@
     <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
     <property name="WebServerToolWindowFactoryState" value="false" />
     <property name="aspect.path.notification.shown" value="true" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$/src/sprockell" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
     <property name="node.js.detected.package.eslint" value="true" />
     <property name="node.js.detected.package.tslint" value="true" />
     <property name="node.js.path.for.package.eslint" value="project" />
@@ -52,14 +64,15 @@
     <property name="nodejs_package_manager_path" value="npm" />
   </component>
   <component name="RecentsManager">
-    <key name="CopyFile.RECENT_KEYS">
-      <recent name="$PROJECT_DIR$/src/sprockell" />
-    </key>
     <key name="MoveFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/src/draft" />
       <recent name="$PROJECT_DIR$/src/implementation" />
       <recent name="$PROJECT_DIR$/src/sprockell" />
       <recent name="$PROJECT_DIR$/src/implementation/tests" />
       <recent name="$PROJECT_DIR$/src/language_definition" />
+    </key>
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/src/sprockell" />
     </key>
   </component>
   <component name="SvnConfiguration">
@@ -90,6 +103,9 @@
       <workItem from="1592884917917" duration="139000" />
       <workItem from="1592908370882" duration="1958000" />
       <workItem from="1592910691155" duration="1333000" />
+      <workItem from="1592920270564" duration="7468000" />
+      <workItem from="1592962058902" duration="2842000" />
+      <workItem from="1592965473628" duration="1636000" />
     </task>
     <servers />
   </component>

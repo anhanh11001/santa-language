@@ -43,6 +43,6 @@ data Expr = NumExp Integer --
           deriving (Eq, Show)
 
 data VarType = Num | Boo | Char | Str deriving (Eq, Show) --
-data BoolOp = And | Or deriving (Eq, Show) --
+data BoolOp = AndOp | OrOp deriving (Eq, Show) --
 data OrdOp = L | M | E | LE | ME | NE deriving (Eq, Show) --
-data CalcOp = Add | Sub | Mult | Div deriving (Eq, Show) --
+data CalcOp = AddOp | SubOp | Mult | Div deriving (Eq, Show) --

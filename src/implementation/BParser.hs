@@ -19,8 +19,8 @@ varType' = transform "num" Num
 boolOp :: Parser BoolOp
 boolOp = spaces >> boolOp' <?> "Fail on boolOp"
 boolOp' :: Parser BoolOp
-boolOp' = transform "&&" And
-      <|> transform "||" Or
+boolOp' = transform "&&" AndOp
+      <|> transform "||" OrOp
 
 ordOp :: Parser OrdOp
 ordOp = spaces >> ordOp' <?> "Fail on ordOp"
@@ -125,8 +125,8 @@ program = Program <$> (endBy stmt (symbol ";")) <?> "Fail on program"
 calcOp :: String -> Parser CalcOp
 calcOp op = spaces >> (calcOp' op) <?> "Fail on calcOp"
 calcOp' :: String -> Parser CalcOp
-calcOp' op = case op of "+" -> transform op Add
-                        "-" -> transform op Sub
+calcOp' op = case op of "+" -> transform op AddOp
+                        "-" -> transform op SubOp
                         "*" -> transform op Mult
                         "/" -> transform op Div
                         otherwise -> error "Invalid operator"
