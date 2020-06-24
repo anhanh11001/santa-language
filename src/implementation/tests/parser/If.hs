@@ -20,6 +20,6 @@ t2 = check "t2"
            (IfTwo (CondExp (Parens (NumCalc (VarExp "x") AddOp (NumExp 10))) NE (VarExp "y"))
                  (Scope [VarDecStmt (VarDec Num "x" (NumExp 11))]))
 
-tests = TestList [ TestLabel "t1" t1
-                 , TestLabel "t2" t2
-                 ]
+run = runTestTT $ TestList [ TestLabel "t1" t1
+                           , TestLabel "t2" t2
+                           ]

@@ -23,7 +23,7 @@ t3 = check "t3"
            (VarReDec "compared" (CondExp (NumCalc (NumExp 11) Div (NumExp 2)) E (NumExp 5)))
 
 
-tests = TestList [ TestLabel "t1" t1
-                 , TestLabel "t2" t2
-                 , TestLabel "t3" t3
-                 ]
+run = runTestTT $ TestList [ TestLabel "t1" t1
+                           , TestLabel "t2" t2
+                           , TestLabel "t3" t3
+                           ]

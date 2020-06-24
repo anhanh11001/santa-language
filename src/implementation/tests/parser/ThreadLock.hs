@@ -34,10 +34,10 @@ t6 = checkT "t6"
             "christmas_stop newGame"
             (ThrStop "newGame")
 
-tests = TestList [ TestLabel "t1" t1
-                 , TestLabel "t2" t2
-                 , TestLabel "t3" t3
-                 , TestLabel "t4" t4
-                 , TestLabel "t5" t5
-                 , TestLabel "t6" t6
-                 ]
+run = runTestTT $ TestList [ TestLabel "t1" t1
+                           , TestLabel "t2" t2
+                           , TestLabel "t3" t3
+                           , TestLabel "t4" t4
+                           , TestLabel "t5" t5
+                           , TestLabel "t6" t6
+                           ]

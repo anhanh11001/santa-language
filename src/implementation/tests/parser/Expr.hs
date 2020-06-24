@@ -22,12 +22,12 @@ t8 = check "t8"
            "a && true && (1+1 != 2)" 
            (BooCalc (VarExp "a") AndOp (BooCalc (BooExp True) AndOp (Parens (CondExp (NumCalc (NumExp 1) AddOp (NumExp 1)) NE (NumExp 2)))))
 
-tests = TestList [ TestLabel "t1" t1
-                 , TestLabel "t2" t2
-                 , TestLabel "t3" t3
-                 , TestLabel "t4" t4
-                 , TestLabel "t5" t5
-                 , TestLabel "t6" t6
-                 , TestLabel "t7" t7
-                 , TestLabel "t8" t8
-                 ]
+run = runTestTT $ TestList [ TestLabel "t1" t1
+                           , TestLabel "t2" t2
+                           , TestLabel "t3" t3
+                           , TestLabel "t4" t4
+                           , TestLabel "t5" t5
+                           , TestLabel "t6" t6
+                           , TestLabel "t7" t7
+                           , TestLabel "t8" t8
+                           ]

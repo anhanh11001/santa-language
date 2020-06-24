@@ -14,5 +14,4 @@ t1 = check "t1"
            (Where (CondExp (VarExp "duc") E (VarExp "goodStudent"))
                  (Scope [VarReDecStmt (VarReDec "a" (NumExp 13))]))
 
-tests = TestList [ TestLabel "t1" t1
-                 ]
+run = runTestTT $ TestList [ TestLabel "t1" t1 ]

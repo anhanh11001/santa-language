@@ -1,15 +1,13 @@
-// Declare and redeclare variable
 santa_make_gift num a = 12;
 santa_make_gift bool b = true;
-santa_make_gift str c = "hello";
-santa_change_gift c = "hello world";
 
-// if, where statement
 santa_check (a >= 11) then_he_do {
     santa_make_gift num a = 0;
-    santa_go_to_factory when (a < 5) {
+    santa_go_to_factory_when (a < 5) {
         santa_make_gift bool someRandomGift = true && false;
+        santa_make_gift num c = 2;
         santa_change_gift a = a + 1;
+        santa_change_gift c = c * 100;
     };
 } otherwise_he_do {
     santa_make_gift num a = 0;
@@ -18,21 +16,11 @@ santa_check (a >= 11) then_he_do {
         santa_make_gift num c = 22;
     };
 };
+
 santa_check (a >= 11) then_he_do {
     santa_change_gift a = 0;
 };
-santa_make_gift str d = "hello";
 
-// functions
-/*
-reindeer_num_addNumber (num m, num n) that do {
-    santa make gift res = m + n;
-    return res;
-};
-santa change gift a = santa call reindeer addNumber (1, 2);
-*/
-
-// threadings
 santa_make_gift num sum = 0;
 santa_lock_create sumLock;
 
@@ -54,4 +42,3 @@ santa_go_to_factory_when (i < 100) {
 };
 
 christmas_stop addToSum;
-// After this, sum should be 1000 now
