@@ -6,8 +6,8 @@ import Data.Either
 import Text.ParserCombinators.Parsec
 import LangDef
 
-check testName stream res = TestCase (
-  assertEqual testName (parse ifP "Error" stream) (Right res))
+check testName stream res = TestLabel testName (TestCase (
+  assertEqual testName (parse ifP "Error" stream) (Right res)))
 
 t1 = check "t1" 
            "santa_check (a == 2) then_he_do { santa_change_gift a = 13; } otherwise_he_do { santa_change_gift a = 14; }"
@@ -20,6 +20,4 @@ t2 = check "t2"
            (IfTwo (CondExp (Parens (NumCalc (VarExp "x") AddOp (NumExp 10))) NE (VarExp "y"))
                  (Scope [VarDecStmt (VarDec Num "x" (NumExp 11))]))
 
-run = runTestTT $ TestList [ TestLabel "t1" t1
-                           , TestLabel "t2" t2
-                           ]
+run = runTestTT $ TestList [ t1, t2 ]

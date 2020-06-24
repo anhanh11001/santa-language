@@ -6,8 +6,8 @@ import Data.Either
 import Text.ParserCombinators.Parsec
 import LangDef
 
-check testName stream res = TestCase (
-  assertEqual testName (parse varDec "Error" stream) (Right res))
+check testName stream res = TestLabel testName (TestCase (
+  assertEqual testName (parse varDec "Error" stream) (Right res)))
 
 t1 = check "t1"
            "santa_make_gift bool isCreated = false"
@@ -22,7 +22,4 @@ t3 = check "t3"
            (VarDec Boo "compared" (CondExp (NumCalc (NumExp 11) Div (NumExp 2)) E (NumExp 5)))
 
 
-run = runTestTT $ TestList [ TestLabel "t1" t1
-                           , TestLabel "t2" t2
-                           , TestLabel "t3" t3
-                           ]
+run = runTestTT $ TestList [ t1, t2, t3 ]

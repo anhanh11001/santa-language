@@ -10,7 +10,7 @@ data ElemVar = ElemVar String VarType
              | ElemScope VarScope deriving (Eq, Show)
 
 prettyTypeScope :: VarScope -> String
-prettyTypeScope (VarScope _ elems) = "[ " ++ (intercalate ", " (map prettyElem elems)) ++ " ]"
+prettyTypeScope (VarScope _ elems) = "[" ++ (intercalate ", " (map prettyElem elems)) ++ "]"
 
 prettyElem :: ElemVar -> String
 prettyElem elem = case elem of (ElemVar varName varType) -> ((show varType) ++ ": " ++ varName)

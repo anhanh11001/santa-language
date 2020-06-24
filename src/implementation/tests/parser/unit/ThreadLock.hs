@@ -6,11 +6,11 @@ import Data.Either
 import Text.ParserCombinators.Parsec
 import LangDef
 
-checkL testName stream res = TestCase (
-  assertEqual testName (parse lock "Error" stream) (Right res))
+checkL testName stream res = TestLabel testName (TestCase (
+  assertEqual testName (parse lock "Error" stream) (Right res)))
 
-checkT testName stream res = TestCase (
-  assertEqual testName (parse thread "Error" stream) (Right res))
+checkT testName stream res = TestLabel testName (TestCase (
+  assertEqual testName (parse thread "Error" stream) (Right res)))
   
 t1 = checkL "t1" 
             "santa_lock_create ducLeTran"
@@ -34,10 +34,4 @@ t6 = checkT "t6"
             "christmas_stop newGame"
             (ThrStop "newGame")
 
-run = runTestTT $ TestList [ TestLabel "t1" t1
-                           , TestLabel "t2" t2
-                           , TestLabel "t3" t3
-                           , TestLabel "t4" t4
-                           , TestLabel "t5" t5
-                           , TestLabel "t6" t6
-                           ]
+run = runTestTT $ TestList [ t1, t2, t3, t4, t5, t6 ]

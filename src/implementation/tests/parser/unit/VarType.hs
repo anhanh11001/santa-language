@@ -5,19 +5,14 @@ import Test.HUnit
 import Data.Either
 import Text.ParserCombinators.Parsec
 
-check stream = isRight (parse varType "Error" stream)
+check testName stream = TestLabel testName (TestCase (assertBool testName (isRight (parse varType "Error" stream))))
 
-t1 = TestCase (assertBool "t1" (check "num"))
-t2 = TestCase (assertBool "t2" (check "bool"))
-t3 = TestCase (assertBool "t3" (check "char"))
-t4 = TestCase (assertBool "t4" (check "  num    "))
-t5 = TestCase (assertBool "t5" (check "  bool    "))
+t1 = check "t1" "num"
+t2 = check "t2" "bool"
+t3 = check "t3" "char"
+t4 = check "t4" "  num    "
+t5 = check "t5" "  bool    "
 
 
-run = runTestTT $ TestList [ TestLabel "t1" t1
-                           , TestLabel "t2" t2
-                           , TestLabel "t3" t3
-                           , TestLabel "t4" t4
-                           , TestLabel "t5" t5
-                           ]
+run = runTestTT $ TestList [ t1, t2, t3, t4, t5 ]
 

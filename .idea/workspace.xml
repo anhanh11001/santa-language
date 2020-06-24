@@ -12,9 +12,16 @@
   <component name="ChangeListManager">
     <list default="true" id="05d4008b-1853-498c-9879-6b49e7e2974a" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/implementation/BParser.hs" beforeDir="false" afterPath="$PROJECT_DIR$/src/implementation/BParser.hs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/implementation/Main.hs" beforeDir="false" afterPath="$PROJECT_DIR$/src/implementation/Main.hs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/implementation/TypeScope.hs" beforeDir="false" afterPath="$PROJECT_DIR$/src/implementation/TypeScope.hs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/implementation/tests/parser/unit/BoolOp.hs" beforeDir="false" afterPath="$PROJECT_DIR$/src/implementation/tests/parser/unit/BoolOp.hs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/implementation/tests/parser/unit/Expr.hs" beforeDir="false" afterPath="$PROJECT_DIR$/src/implementation/tests/parser/unit/Expr.hs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/implementation/tests/parser/unit/If.hs" beforeDir="false" afterPath="$PROJECT_DIR$/src/implementation/tests/parser/unit/If.hs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/implementation/tests/parser/unit/OrdOp.hs" beforeDir="false" afterPath="$PROJECT_DIR$/src/implementation/tests/parser/unit/OrdOp.hs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/implementation/tests/parser/unit/ThreadLock.hs" beforeDir="false" afterPath="$PROJECT_DIR$/src/implementation/tests/parser/unit/ThreadLock.hs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/implementation/tests/parser/unit/VarDec.hs" beforeDir="false" afterPath="$PROJECT_DIR$/src/implementation/tests/parser/unit/VarDec.hs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/implementation/tests/parser/unit/VarReDec.hs" beforeDir="false" afterPath="$PROJECT_DIR$/src/implementation/tests/parser/unit/VarReDec.hs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/implementation/tests/parser/unit/VarType.hs" beforeDir="false" afterPath="$PROJECT_DIR$/src/implementation/tests/parser/unit/VarType.hs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/implementation/tests/parser/unit/Where.hs" beforeDir="false" afterPath="$PROJECT_DIR$/src/implementation/tests/parser/unit/Where.hs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -24,6 +31,7 @@
   <component name="FileTemplateManagerImpl">
     <option name="RECENT_TEMPLATES">
       <list>
+        <option value="FxmlFile" />
         <option value="Haskell Module" />
       </list>
     </option>
@@ -54,15 +62,15 @@
     <property name="nodejs_package_manager_path" value="npm" />
   </component>
   <component name="RecentsManager">
-    <key name="CopyFile.RECENT_KEYS">
-      <recent name="$PROJECT_DIR$/src/sprockell" />
-    </key>
     <key name="MoveFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/src/implementation/tests/type_scope/prog" />
+      <recent name="$PROJECT_DIR$/src/implementation/tests/type_scope/unit" />
       <recent name="$PROJECT_DIR$/src/implementation/tests/parser/prog" />
       <recent name="$PROJECT_DIR$/src/implementation/tests/parser/unit" />
       <recent name="$PROJECT_DIR$/src/implementation/tests/program" />
-      <recent name="$PROJECT_DIR$/src/draft" />
-      <recent name="$PROJECT_DIR$/src/implementation" />
+    </key>
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/src/sprockell" />
     </key>
   </component>
   <component name="SvnConfiguration">
@@ -97,7 +105,7 @@
       <workItem from="1592962058902" duration="2842000" />
       <workItem from="1592965473628" duration="11786000" />
       <workItem from="1593000798292" duration="240000" />
-      <workItem from="1593001316450" duration="4280000" />
+      <workItem from="1593001316450" duration="11637000" />
     </task>
     <servers />
   </component>
@@ -117,10 +125,11 @@
     <option name="oldMeFiltersMigrated" value="true" />
   </component>
   <component name="WindowStateProjectService">
-    <state x="304" y="187" key="#com.intellij.execution.impl.EditConfigurationsDialog" timestamp="1592660389393">
-      <screen x="0" y="0" width="1680" height="1050" />
+    <state x="324" y="199" key="#com.intellij.execution.impl.EditConfigurationsDialog" timestamp="1593013232847">
+      <screen x="0" y="0" width="1792" height="1120" />
     </state>
     <state x="304" y="187" key="#com.intellij.execution.impl.EditConfigurationsDialog/0.0.1680.1050@0.0.1680.1050" timestamp="1592660389393" />
+    <state x="324" y="199" key="#com.intellij.execution.impl.EditConfigurationsDialog/0.0.1792.1120@0.0.1792.1120" timestamp="1593013232847" />
     <state x="532" y="334" key="#com.intellij.fileTypes.FileTypeChooser" timestamp="1592661429689">
       <screen x="0" y="0" width="1680" height="1050" />
     </state>
