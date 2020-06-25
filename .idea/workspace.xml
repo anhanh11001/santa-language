@@ -13,6 +13,7 @@
     <list default="true" id="05d4008b-1853-498c-9879-6b49e7e2974a" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/implementation/CodeGen.hs" beforeDir="false" afterPath="$PROJECT_DIR$/src/implementation/CodeGen.hs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/implementation/Main.hs" beforeDir="false" afterPath="$PROJECT_DIR$/src/implementation/Main.hs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -96,7 +97,8 @@
       <workItem from="1592962058902" duration="2842000" />
       <workItem from="1592965473628" duration="11786000" />
       <workItem from="1593000798292" duration="240000" />
-      <workItem from="1593001316450" duration="17184000" />
+      <workItem from="1593001316450" duration="18015000" />
+      <workItem from="1593052580209" duration="8665000" />
     </task>
     <servers />
   </component>
