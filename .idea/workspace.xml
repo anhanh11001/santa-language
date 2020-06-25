@@ -12,8 +12,9 @@
   <component name="ChangeListManager">
     <list default="true" id="05d4008b-1853-498c-9879-6b49e7e2974a" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/implementation/CodeGen.hs" beforeDir="false" afterPath="$PROJECT_DIR$/src/implementation/CodeGen.hs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/implementation/Main.hs" beforeDir="false" afterPath="$PROJECT_DIR$/src/implementation/Main.hs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/draft/SpCheck.hs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/implementation/TSP.hs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/implementation/test_prog.txt" beforeDir="false" afterPath="$PROJECT_DIR$/src/implementation/test_prog.txt" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -98,7 +99,8 @@
       <workItem from="1592965473628" duration="11786000" />
       <workItem from="1593000798292" duration="240000" />
       <workItem from="1593001316450" duration="18015000" />
-      <workItem from="1593052580209" duration="8665000" />
+      <workItem from="1593052580209" duration="8863000" />
+      <workItem from="1593092154357" duration="1788000" />
     </task>
     <servers />
   </component>
@@ -118,11 +120,11 @@
     <option name="oldMeFiltersMigrated" value="true" />
   </component>
   <component name="WindowStateProjectService">
-    <state x="324" y="199" key="#com.intellij.execution.impl.EditConfigurationsDialog" timestamp="1593013232847">
+    <state x="324" y="199" key="#com.intellij.execution.impl.EditConfigurationsDialog" timestamp="1593093802229">
       <screen x="0" y="0" width="1792" height="1120" />
     </state>
     <state x="304" y="187" key="#com.intellij.execution.impl.EditConfigurationsDialog/0.0.1680.1050@0.0.1680.1050" timestamp="1592660389393" />
-    <state x="324" y="199" key="#com.intellij.execution.impl.EditConfigurationsDialog/0.0.1792.1120@0.0.1792.1120" timestamp="1593013232847" />
+    <state x="324" y="199" key="#com.intellij.execution.impl.EditConfigurationsDialog/0.0.1792.1120@0.0.1792.1120" timestamp="1593093802229" />
     <state x="532" y="334" key="#com.intellij.fileTypes.FileTypeChooser" timestamp="1592661429689">
       <screen x="0" y="0" width="1680" height="1050" />
     </state>
