@@ -7,32 +7,85 @@ import Debug.Trace
 data VarMap = VarMap VarMap [VarMem]
             | NullMap deriving (Eq, Show)
 data VarMem = VarMem String AddrImmDI
-            | MapMem VarMap deriving (Eq, Show)
+            | MapMem VarMap
+            | ThrMem String AddrImmDI VarMap [Instruction] deriving (Eq, Show)
+            -- For thread variable: We have varMem1 = VarMem String AddrImmDI of the thread name
+            --                              varMem2 = MapMem VarMap of thread scope
+            --                              instrucions list = stored saved instructions list
 
-temporaryAddresses = 2
+tempAddresses = 2
+temp1 = DirAddr 4
+temp2 = DirAddr 5
+
+maxThread = 4
+thr1 = DirAddr 0
+thr2 = DirAddr 1
+thr3 = DirAddr 2
+thr4 = DirAddr 3
+
+nextAddr map =  DirAddr $ (countMap map) + maxThread + tempAddresses
+nextThrAddr map scopeMap = DirAddr $ (countThr map) + (countThrD scopeMap) + 1
+
 
 findVarMem :: String -> VarMap -> AddrImmDI
 findVarMem varNem NullMap = error ("Cannot find " ++ varNem)
 findVarMem varMem (VarMap motherMap []) = findVarMem varMem motherMap
-findVarMem varMem (VarMap motherMap ((VarMem memName memAddr):y)) = if (varMem == memName)
-  then memAddr else findVarMem varMem (VarMap motherMap y)
+findVarMem varMem (VarMap motherMap (x:y)) = case x of (VarMem memName memAddr) -> if (varMem == memName) then memAddr else findNext
+                                                       otherwise -> findNext
+                                             where findNext = findVarMem varMem (VarMap motherMap y)
 
-storeVarMem :: String -> AddrImmDI -> VarMap -> VarMap
-storeVarMem varName addr NullMap = VarMap NullMap [VarMem varName addr]
-storeVarMem varName addr (VarMap m mems) = VarMap m (mems ++ [VarMem varName addr])
+findThrMem :: String -> VarMap -> VarMem
+findThrMem thrName NullMap = error ("Cannot find " ++ thrName)
+findThrMem thrName (VarMap motherMap []) = findThrMem thrName motherMap
+findThrMem thrName (VarMap motherMap (x:y)) = case x of (ThrMem name a b c) -> if (thrName == name) then (ThrMem name a b c) else findNext
+                                                        otherwise -> findNext
+                                             where findNext = findThrMem thrName (VarMap motherMap y)
 
+storeVar :: VarMem -> VarMap -> VarMap
+storeVar var map = case map of NullMap -> VarMap NullMap [var]
+                               (VarMap m mems) -> VarMap m (mems ++ [var])
+
+countThr :: VarMap -> Int
+countThr map = case map of NullMap -> 0
+                           (VarMap mother mem) -> (countThrD map) + (countThrU mother map)
+
+-----------------
+countThrU' :: VarMap -> [VarMem] -> Int
+countThrU' _ [] = 0
+countThrU' mapToAvoid (x:y) = case x of (VarMem _ _) -> next
+                                        (MapMem map) -> if (map == mapToAvoid) then next else (countThrD map) + next
+                                        (ThrMem _ _ map _) -> if (map == mapToAvoid) then 1 + next else (countThrD map) + next + 1
+                              where next = countThrU' mapToAvoid y
+countThrD :: VarMap -> Int
+countThrD NullMap = 0
+countThrD (VarMap _ mem) = countThrD' mem
+
+countThrD' :: [VarMem] -> Int
+countThrD' [] = 0
+countThrD' (x:y) = case x of (VarMem _ _) -> countThrD' y
+                             (MapMem map) -> countThrD map
+                             (ThrMem _ _ map _) -> 1 + countThrD map
+
+countThrU :: VarMap -> VarMap -> Int
+countThrU map child = case map of NullMap -> 0
+                                  (VarMap mother mem) -> (countThrU mother map) + (countThrU' child mem)
+
+
+-----------------
 countMap :: VarMap -> Int
 countMap map = case map of NullMap -> 0
-                           (VarMap mother mem) -> (countMapD map) + (countMapU mother)
+                           (VarMap mother mem) -> (countMapD map) + (countMapU mother map)
 
-countMapU :: VarMap -> Int
-countMapU NullMap = 0
-countMapU (VarMap mother mem) = (countMapU mother) + (countMapU' mem)
+countMapU :: VarMap -> VarMap -> Int
+countMapU map child = case map of NullMap -> 0
+                                  (VarMap mother mem) -> (countMapU mother map) + (countMapU' child mem)
 
-countMapU' :: [VarMem] -> Int
-countMapU' [] = 0
-countMapU' (x:y) = case x of (VarMem _ _) -> 1 + (countMapU' y)
-                             (MapMem _) -> 0
+countMapU' :: VarMap -> [VarMem] -> Int
+countMapU' _ [] = 0
+countMapU' mapToAvoid (x:y) = case x of (VarMem _ _) -> 1 + next
+                                        (MapMem map) ->  if (map == mapToAvoid) then next else (countMapD map) + next
+                                        (ThrMem _ _ map _) -> if (map == mapToAvoid) then 1 + next else (countMapD map) + next + 1
+                              where next = countMapU' mapToAvoid y
 countMapD :: VarMap -> Int
 countMapD NullMap = 0
 countMapD (VarMap _ mem) = countMapD' mem
@@ -40,14 +93,22 @@ countMapD (VarMap _ mem) = countMapD' mem
 countMapD' :: [VarMem] -> Int
 countMapD' [] = 0
 countMapD' (x:y) = case x of (VarMem _ _) -> 1 + (countMapD' y)
-                             (MapMem m) -> countMapD m
+                             (MapMem map) -> countMapD map
+                             (ThrMem _ _ map _) -> 1 + countMapD map
 
-genCode :: Program -> [Instruction]
-genCode (Program stmts) = (fst (genCode' NullMap stmts [])) ++ [EndProg]
+genCode :: Program -> [[Instruction]]
+genCode prog = genRP instrs (countThrD map + 1) []
+  where (instrs, map) = genInstrs prog
+        genRP _ 0 x = x
+        genRP l num x = genRP l (num - 1) (l : x)
 
-genCode' :: VarMap -> [Stmt] -> [Instruction] -> ([Instruction], VarMap)
-genCode' map [] instrs = (instrs, map)
-genCode' map (x:y) instrs = genCode' newMap y (instrs ++ instr)
+genInstrs :: Program -> ([Instruction], VarMap)
+genInstrs (Program stmts) = (intrs ++ [EndProg], map)
+  where (intrs, map) = genInstrs' NullMap stmts []
+
+genInstrs' :: VarMap -> [Stmt] -> [Instruction] -> ([Instruction], VarMap)
+genInstrs' map [] instrs = (instrs, map)
+genInstrs' map (x:y) instrs = genInstrs' newMap y (instrs ++ instr)
   where (instr, newMap) = genStmt x map
 
 genStmt :: Stmt -> VarMap -> ([Instruction], VarMap)
@@ -56,12 +117,35 @@ genStmt stmt map = case stmt of (VarDecStmt (VarDec _ varName val)) -> genVarDec
                                 (WheStmt (Where expr scope)) -> genWhere map expr scope
                                 (IfStmt ifStmt) -> genIf map ifStmt
                                 (LockStmt lockStmt) -> genLock map lockStmt
-                                (ThreadStmt thrStmt) -> undefined
+                                (ThreadStmt thrStmt) -> genThread map thrStmt
                                 (PrintStmt varName) -> genVarPrint map varName
 
+genThread :: VarMap -> Thread -> ([Instruction], VarMap)
+genThread map thr = case thr of (ThrCreate thrName scope) -> genThrCreate map thrName scope
+                                (ThrStart thrName) -> genThrStart map thrName
+                                (ThrStop thrName) -> genThrStop map thrName
+
+genThrCreate :: VarMap -> String -> Scope -> ([Instruction], VarMap)
+genThrCreate map thrName (Scope stmts) = ([], updatedMap)
+  where updatedMap = storeVar thrMem map
+        thrMem = ThrMem thrName (nextThrAddr map scopeMap) scopeMap scopeInstrs
+        (scopeInstrs, scopeMap) = genInstrs' (VarMap map []) stmts []
+
+genThrStart :: VarMap -> String -> ([Instruction], VarMap)
+genThrStart map thrName = genThrStart' map (findThrMem thrName map)
+
+genThrStart' :: VarMap -> VarMem -> ([Instruction], VarMap)
+genThrStart' map (ThrMem _ addr _ instrs) = ([ Load (ImmValue ((\(DirAddr i) -> i) addr)) regA
+                                             , Compute NEq regA regSprID regA
+                                             , Branch regA (Rel (length instrs + 1)) ] ++ instrs
+                                             , map)
+
+genThrStop :: VarMap -> String -> ([Instruction], VarMap)
+genThrStop map thrName = ([], map) -- TODO
+  where (ThrMem _ addr map instrs) = findThrMem thrName map
+
 genVarPrint :: VarMap -> String -> ([Instruction], VarMap)
-genVarPrint map varName = ([ Load (findVarMem varName map) regA
-                           , WriteInstr regA numberIO ], map)
+genVarPrint map varName = ([ Load (findVarMem varName map) regA , WriteInstr regA numberIO ], map)
 
 genLock :: VarMap -> Lock -> ([Instruction], VarMap)
 genLock varMap lock = case lock of (LckCreate lockName) -> genLockCreate varMap lockName
@@ -72,8 +156,8 @@ genLockCreate :: VarMap -> String -> ([Instruction], VarMap)
 genLockCreate varMap lockName = (instrs, newVarMap)
   where instrs = [Load (ImmValue 0) regA
                  , Store regA addr]
-        newVarMap = storeVarMem lockName addr varMap
-        addr = DirAddr (countMap varMap + 1 + temporaryAddresses)
+        newVarMap = storeVar (VarMem lockName addr) varMap
+        addr = nextAddr varMap
 
 genLockLock :: VarMap -> String -> ([Instruction], VarMap)
 genLockLock varMap lockName = (instrs, varMap)
@@ -92,8 +176,8 @@ genLockUnlock varMap lockName = (instrs, varMap)
 genVarDec :: VarMap -> String -> Expr -> ([Instruction], VarMap)
 genVarDec varMap varName expr = (instrs, newVarMap)
   where instrs = genExpr varMap addr expr
-        newVarMap = storeVarMem varName addr varMap
-        addr = DirAddr (countMap varMap + 1 + temporaryAddresses)
+        newVarMap = storeVar (VarMem varName addr) varMap
+        addr = nextAddr varMap
 
 genVarReDec :: VarMap -> String -> Expr -> [Instruction]
 genVarReDec map varName expr = genExpr map (findVarMem varName map) expr
@@ -101,14 +185,15 @@ genVarReDec map varName expr = genExpr map (findVarMem varName map) expr
 genWhere :: VarMap -> Expr -> Scope -> ([Instruction], VarMap)
 genWhere map expr (Scope stmts) = ( exprInstrs ++
                                     [ Load (ImmValue 1) regA,
-                                      Load (DirAddr 1) regF,
-                                      Compute Sub regA regF regF,
-                                      Branch regF (Rel (length scopeInstrs + 2)) ] ++
+                                      Load temp1 regB,
+                                      Compute Sub regA regB regB,
+                                      Branch regB (Rel (length scopeInstrs + 2)) ] ++
                                     scopeInstrs ++
                                     [ Jump (Rel (- (length scopeInstrs) - 4 - (length exprInstrs))) ]
-                                    ,updatedMap)
-  where exprInstrs = genExpr map (DirAddr 1) expr
-        (scopeInstrs, updatedMap) = genCode' (VarMap map []) stmts []
+                                    , updatedMap2)
+  where exprInstrs = genExpr map temp1 expr
+        updatedMap2 = storeVar (MapMem updatedMap) map
+        (scopeInstrs, updatedMap) = genInstrs' (VarMap map []) stmts []
 
 genIf :: VarMap -> If -> ([Instruction], VarMap)
 genIf map ifStmt = case ifStmt of (IfOne expr scope1 scope2) -> genIfOne map expr scope1 scope2
@@ -117,27 +202,30 @@ genIf map ifStmt = case ifStmt of (IfOne expr scope1 scope2) -> genIfOne map exp
 genIfOne :: VarMap -> Expr -> Scope -> Scope -> ([Instruction], VarMap)
 genIfOne map expr (Scope stmts1) (Scope stmts2) = ( exprInstrs ++
                                                     [ Load (ImmValue 1) regA,
-                                                      Load (DirAddr 1) regF,
-                                                      Compute Sub regA regF regF,
-                                                      Branch regF (Rel (length scopeInstrs1 + 2)) ] ++
+                                                      Load temp1 regB,
+                                                      Compute Sub regA regB regB,
+                                                      Branch regB (Rel (length scopeInstrs1 + 2)) ] ++
                                                     scopeInstrs1 ++
                                                     [ Jump (Rel (length scopeInstrs2 + 1)) ] ++
                                                     scopeInstrs2
-                                                  , updatedMap2 )
-  where exprInstrs = genExpr map (DirAddr 1) expr
-        (scopeInstrs1, updatedMap1) = genCode' (VarMap map []) stmts1 []
-        (scopeInstrs2, updatedMap2) = genCode' (VarMap updatedMap1 []) stmts2 []
+                                                  , updatedMap4 )
+  where exprInstrs = genExpr map temp1 expr
+        updatedMap4 = storeVar (MapMem updatedMap3) updatedMap2
+        (scopeInstrs2, updatedMap3) = genInstrs' (VarMap updatedMap2 []) stmts2 []
+        updatedMap2 = storeVar (MapMem updatedMap1) map
+        (scopeInstrs1, updatedMap1) = genInstrs' (VarMap map []) stmts1 []
 
 genIfTwo :: VarMap -> Expr -> Scope -> ([Instruction], VarMap)
 genIfTwo map expr (Scope stmts) = ( exprInstrs ++
                                     [ Load (ImmValue 1) regA
-                                    , Load (DirAddr 1) regF
-                                    , Compute Sub regA regF regF
-                                    , Branch regF (Rel (length scopeInstrs + 1))] ++
+                                    , Load temp1 regB
+                                    , Compute Sub regA regB regB
+                                    , Branch regB (Rel (length scopeInstrs + 1))] ++
                                     scopeInstrs
-                                  , updatedMap)
-  where exprInstrs = genExpr map (DirAddr 1) expr
-        (scopeInstrs, updatedMap) = genCode' (VarMap map []) stmts []
+                                  , updatedMap2)
+  where exprInstrs = genExpr map temp1 expr
+        updatedMap2 = storeVar (MapMem updatedMap) map
+        (scopeInstrs, updatedMap) = genInstrs' (VarMap map []) stmts []
 
 genExpr :: VarMap -> AddrImmDI -> Expr -> [Instruction]
 genExpr map addr expr = case expr of (NumExp val) -> genNum addr val
@@ -149,24 +237,24 @@ genExpr map addr expr = case expr of (NumExp val) -> genNum addr val
                                      (Parens ex) -> genExpr map addr ex
 
 genNum :: AddrImmDI -> Integer -> [Instruction]
-genNum addr num = [Load (ImmValue $ fromInteger $ num) regA,
-                     Store regA addr]
+genNum addr num = [ Load (ImmValue $ fromInteger $ num) regA
+                  , Store regA addr]
 
 genBool :: AddrImmDI -> Bool -> [Instruction]
-genBool addr bool = [Load (ImmValue $ (\x -> if x then 1 else 0) bool) regA,
-                       Store regA addr]
+genBool addr bool = [ Load (ImmValue $ (\x -> if x then 1 else 0) bool) regA,
+                    , Store regA addr]
 
 genVar :: VarMap -> AddrImmDI -> String -> [Instruction]
-genVar map addr var =  [Load (findVarMem var map) regA,
-                          Store regA addr]
+genVar map addr var =  [ Load (findVarMem var map) regA
+                       , Store regA addr]
 
 genNumCalc :: VarMap -> AddrImmDI -> Expr -> CalcOp -> Expr -> [Instruction]
 genNumCalc map addr ex1 op ex2
     | op `elem` [AddOp, SubOp, Mult] = genCalc map addr ex1 (mapCalcOp op) ex2
-    | otherwise =  (genExpr map (DirAddr 1) ex1) ++
-                   (genExpr map (DirAddr 2) ex2) ++
-                   [ Load (DirAddr 1) regA
-                   , Load (DirAddr 2) regB
+    | otherwise =  (genExpr map temp1 ex1) ++
+                   (genExpr map temp2 ex2) ++
+                   [ Load temp1 regA
+                   , Load temp2 regB
                    , Load (ImmValue 0) regC
                    , Compute Lt regA regB regD
                    , Branch regD (Rel 4)
@@ -177,10 +265,10 @@ genNumCalc map addr ex1 op ex2
                    ]
 
 genCalc :: VarMap -> AddrImmDI -> Expr -> Operator -> Expr -> [Instruction]
-genCalc map addr ex1 op ex2 = (genExpr map (DirAddr 1) ex1) ++
-                              (genExpr map (DirAddr 2) ex2) ++
-                              [ Load (DirAddr 1) regA
-                              , Load (DirAddr 2) regB
+genCalc map addr ex1 op ex2 = (genExpr map temp1 ex1) ++
+                              (genExpr map temp2 ex2) ++
+                              [ Load temp1 regA
+                              , Load temp2 regB
                               , Compute op regA regB regC
                               , Store regC addr
                               ]
