@@ -3,7 +3,6 @@ module BParser where
 import LangDef
 import PComb
 import Text.ParserCombinators.Parsec
-import TypeScope
 
 transform :: String -> a -> Parser a
 transform x f = (\m -> f) <$> symbol x
@@ -114,6 +113,7 @@ stmt =  VarDecStmt <$> varDec
     <|> IfStmt <$> ifP
     <|> LockStmt <$> lock
     <|> ThreadStmt <$> thread
+    <|> PrintStmt <$> (spaces >> ((reserved "santa say") *> identifier))
     <?> "Fail on stmt"
 
 scope :: Parser Scope

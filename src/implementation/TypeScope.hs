@@ -42,6 +42,11 @@ processElemToScope stmt buildingScope =
                (IfStmt ifStmt) -> processIf ifStmt buildingScope
                (ThreadStmt _) -> buildingScope
                (LockStmt lockStmt) -> processLock lockStmt buildingScope
+               (PrintStmt varName) -> processPrint varName buildingScope
+
+processPrint :: String -> VarScope -> VarScope
+processPrint varName scope = (\_ -> scope) (findElem varName scope)
+
 processLock :: Lock -> VarScope -> VarScope
 processLock lock scope =
   case lock of (LckCreate lockName) -> processLockCreate lockName scope

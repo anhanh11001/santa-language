@@ -10,7 +10,8 @@ data Stmt = VarDecStmt VarDec
           | WheStmt Where
           | IfStmt If
           | LockStmt Lock
-          | ThreadStmt Thread 
+          | ThreadStmt Thread
+          | PrintStmt String
           deriving (Eq, Show)
 
 data Thread = ThrCreate String Scope --
