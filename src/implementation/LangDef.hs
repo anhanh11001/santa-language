@@ -43,7 +43,7 @@ data Expr = NumExp Integer --
           | FuncCall String [Expr]
           deriving (Eq, Show)
 
-data VarType = Num | Boo | Char | Str | Lck deriving (Eq, Show) --
+data VarType = Num | Boo | Char | Str | Lck | Thr deriving (Eq, Show) --
 data BoolOp = AndOp | OrOp deriving (Eq, Show) --
 data OrdOp = L | M | E | LE | ME | NE deriving (Eq, Show) --
 data CalcOp = AddOp | SubOp | Mult | Div deriving (Eq, Show) --

@@ -40,25 +40,37 @@ processElemToScope stmt buildingScope =
                (VarReDecStmt varReDec) -> processVarReDec varReDec buildingScope
                (WheStmt whereStmt) -> processWhere whereStmt buildingScope
                (IfStmt ifStmt) -> processIf ifStmt buildingScope
-               (ThreadStmt _) -> buildingScope
+               (ThreadStmt thrStmt) -> processThread thrStmt buildingScope
                (LockStmt lockStmt) -> processLock lockStmt buildingScope
                (PrintStmt varName) -> processPrint varName buildingScope
+
+processThread :: Thread -> VarScope -> VarScope
+processThread thread scope = 
+  case thread of (ThrCreate thrName thrScope) -> processThrStart thrName thrScope scope
+                 (ThrStart thrName) -> processVarCreated thrName Thr scope
+                 (ThrStop thrName) -> processVarCreated thrName Thr scope
+
+processThrStart :: String -> Scope -> VarScope -> VarScope
+processThrStart thrName scope varScope = scopeU2
+  where scopeU1 = processNewVar thrName Thr varScope
+        scopeU2 = scpa scopeU1 scope
 
 processPrint :: String -> VarScope -> VarScope
 processPrint varName scope = (\_ -> scope) (findElem varName scope)
 
 processLock :: Lock -> VarScope -> VarScope
 processLock lock scope =
-  case lock of (LckCreate lockName) -> processLockCreate lockName scope
-               (LckLock lockName) -> processLockCreated lockName scope
-               (LckUnlock lockName) -> processLockCreated lockName scope
-processLockCreate :: String -> VarScope -> VarScope
-processLockCreate lockName (VarScope motherScope elems)
-  | existedInScope lockName elems = error ("Lock " ++ lockName ++ " already existed!!")
-  | otherwise = addToScope (ElemVar lockName Lck) (VarScope motherScope elems)
-processLockCreated :: String -> VarScope -> VarScope
-processLockCreated lockName scope
-  | (\(ElemVar _ elemType) -> elemType /= Lck) (findElem lockName scope) = error (lockName ++ " is not a lock")
+  case lock of (LckCreate lockName) -> processNewVar lockName Lck scope
+               (LckLock lockName) -> processVarCreated lockName Lck scope
+               (LckUnlock lockName) -> processVarCreated lockName Lck scope
+processNewVar :: String -> VarType -> VarScope -> VarScope
+processNewVar varName varType (VarScope motherScope elems)
+  | existedInScope varName elems = error ("Variable " ++ varName ++ " already existed!!")
+  | otherwise = addToScope (ElemVar varName varType) (VarScope motherScope elems)
+
+processVarCreated :: String -> VarType -> VarScope -> VarScope
+processVarCreated lockName varType scope
+  | (\(ElemVar _ elemType) -> elemType /= varType) (findElem lockName scope) = error ((show varType) ++ ": " ++ lockName ++ " is not a lock")
   | otherwise = scope
 
 processIf :: If -> VarScope -> VarScope

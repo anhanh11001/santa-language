@@ -1,9 +1,7 @@
-santa make gift num a = 10;
-santa make gift num i = 0;
+santa make gift num a = 1;
+santa make gift num i = 1;
 
-santa go to factory when (i < 10) {
-    santa change gift a = a + i;
+santa go to factory when (i < 5) {
+    santa change gift a = a * i;
     santa change gift i = i + 1;
 };
-
-santa say a;
