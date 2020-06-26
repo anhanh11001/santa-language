@@ -14,3 +14,4 @@ main = do
   return instrs
 --  return compiledAST
 --  return typeScopePrint -- compiled_ast
+--  return typeScopePrint

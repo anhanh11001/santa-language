@@ -17,9 +17,9 @@ data Thread = ThrCreate String Scope --
             | ThrStart String --
             | ThrStop String --
             deriving (Eq, Show)
-data Lock = LckCreate String --
-          | LckLock String --
-          | LckUnlock String --
+data Lock = LckCreate String
+          | LckLock String
+          | LckUnlock String
           deriving (Eq, Show)
 
 data Func = Func String deriving (Eq, Show)
@@ -42,7 +42,7 @@ data Expr = NumExp Integer --
           | FuncCall String [Expr]
           deriving (Eq, Show)
 
-data VarType = Num | Boo | Char | Str deriving (Eq, Show) --
+data VarType = Num | Boo | Char | Str | Lck deriving (Eq, Show) --
 data BoolOp = AndOp | OrOp deriving (Eq, Show) --
 data OrdOp = L | M | E | LE | ME | NE deriving (Eq, Show) --
 data CalcOp = AddOp | SubOp | Mult | Div deriving (Eq, Show) --

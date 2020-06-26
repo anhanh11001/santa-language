@@ -51,12 +51,40 @@ genCode' map (x:y) instrs = genCode' newMap y (instrs ++ instr)
   where (instr, newMap) = genStmt x map
 
 genStmt :: Stmt -> VarMap -> ([Instruction], VarMap)
-genStmt stmt map = case stmt of (VarDecStmt (VarDec varType varName val)) -> genVarDec map varName val
+genStmt stmt map = case stmt of (VarDecStmt (VarDec _ varName val)) -> genVarDec map varName val
                                 (VarReDecStmt (VarReDec varName val)) -> (genVarReDec map varName val, map)
                                 (WheStmt (Where expr scope)) -> genWhere map expr scope
                                 (IfStmt ifStmt) -> genIf map ifStmt
                                 (LockStmt lockStmt) -> undefined
                                 (ThreadStmt thrStmt) -> undefined
+
+genLock :: VarMap -> Lock -> ([Instruction], VarMap)
+genLock varMap lock = case lock of (LckCreate lockName) -> genLockCreate varMap lockName
+                                   (LckLock lockName) -> genLockLock varMap lockName
+                                   (LckUnlock lockName) -> genLockUnlock varMap lockName
+
+genLockCreate :: VarMap -> String -> ([Instruction], VarMap)
+genLockCreate varMap lockName = (instrs, newVarMap)
+  where instrs = [Load (ImmValue 0) regA
+                 , Store regA addr]
+        newVarMap = storeVarMem lockName addr varMap
+        addr = DirAddr (countMap varMap + 1 + temporaryAddresses)
+
+genLockLock :: VarMap -> String -> ([Instruction], VarMap)
+genLockLock varMap lockName = (instrs, varMap)
+  where instrs = [ TestAndSet addr
+                 , Receive regA
+                 , Load (ImmValue 1) regB
+                 , Compute Sub regB regA regA
+                 , Branch regA (Rel (-4))
+                 ]
+        addr = findVarMem lockName varMap
+
+genLockUnlock :: VarMap -> String -> ([Instruction], VarMap)
+genLockUnlock varMap lockName = (instrs, varMap)
+  where instrs = [ Load (ImmValue 0) regA
+                 , WriteInstr regA addr]
+        addr = findVarMem lockName varMap
 
 genVarDec :: VarMap -> String -> Expr -> ([Instruction], VarMap)
 genVarDec varMap varName expr = (instrs, newVarMap)

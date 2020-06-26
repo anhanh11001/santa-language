@@ -41,7 +41,20 @@ processElemToScope stmt buildingScope =
                (WheStmt whereStmt) -> processWhere whereStmt buildingScope
                (IfStmt ifStmt) -> processIf ifStmt buildingScope
                (ThreadStmt _) -> buildingScope
-               (LockStmt _) -> buildingScope
+               (LockStmt lockStmt) -> processLock lockStmt buildingScope
+processLock :: Lock -> VarScope -> VarScope
+processLock lock scope =
+  case lock of (LckCreate lockName) -> processLockCreate lockName scope
+               (LckLock lockName) -> processLockCreated lockName scope
+               (LckUnlock lockName) -> processLockCreated lockName scope
+processLockCreate :: String -> VarScope -> VarScope
+processLockCreate lockName (VarScope motherScope elems)
+  | existedInScope lockName elems = error ("Lock " ++ lockName ++ " already existed!!")
+  | otherwise = addToScope (ElemVar lockName Lck) (VarScope motherScope elems)
+processLockCreated :: String -> VarScope -> VarScope
+processLockCreated lockName scope
+  | (\(ElemVar _ elemType) -> elemType /= Lck) (findElem lockName scope) = error (lockName ++ " is not a lock")
+  | otherwise = scope
 
 processIf :: If -> VarScope -> VarScope
 processIf ifStmt scope =

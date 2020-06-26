@@ -1,3 +1,45 @@
 santa make gift num a = 12;
-santa make gift num b = 5;
-santa make gift num c = a / b;
+santa make gift bool b = true;
+
+santa check (a >= 11) then he do {
+    santa make gift num a = 0;
+    santa go to factory when (a < 5) {
+        santa make gift bool someRandomGift = true && false;
+        santa make gift num c = 2;
+        santa change gift a = a + 1;
+        santa change gift c = c * 100;
+    };
+} otherwise he do {
+    santa make gift num a = 0;
+    santa make gift bool b = false;
+    santa check (b) then he do {
+        santa make gift num c = 22;
+    };
+};
+
+santa check (a >= 11) then he do {
+    santa change gift a = 0;
+};
+
+
+santa make gift num sum = 0;
+santa lock create sumLock;
+
+christmas create addToSum {
+    santa make gift num i = 0;
+    santa go to factory when (i < 100) {
+        santa lock sumLock;
+        santa change gift sum = sum + 5;
+        santa unlock sumLock;
+    };
+};
+christmas start addToSum;
+
+santa make gift num i = 0;
+santa go to factory when (i < 100) {
+    santa lock sumLock;
+    santa change gift sum = sum + 5;
+    santa unlock sumLock;
+};
+
+christmas stop addToSum;
