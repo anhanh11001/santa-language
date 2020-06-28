@@ -12,7 +12,7 @@
   <component name="ChangeListManager">
     <list default="true" id="05d4008b-1853-498c-9879-6b49e7e2974a" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/draft/SpCheck.hs" beforeDir="false" afterPath="$PROJECT_DIR$/src/draft/SpCheck.hs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/implementation/BParser.hs" beforeDir="false" afterPath="$PROJECT_DIR$/src/implementation/BParser.hs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/implementation/CodeGen.hs" beforeDir="false" afterPath="$PROJECT_DIR$/src/implementation/CodeGen.hs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/implementation/Main.hs" beforeDir="false" afterPath="$PROJECT_DIR$/src/implementation/Main.hs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/implementation/test_prog.txt" beforeDir="false" afterPath="$PROJECT_DIR$/src/implementation/test_prog.txt" afterDir="false" />
@@ -125,11 +125,11 @@
     <option name="oldMeFiltersMigrated" value="true" />
   </component>
   <component name="WindowStateProjectService">
-    <state x="324" y="199" key="#com.intellij.execution.impl.EditConfigurationsDialog" timestamp="1593357981931">
+    <state x="324" y="199" key="#com.intellij.execution.impl.EditConfigurationsDialog" timestamp="1593362951159">
       <screen x="0" y="0" width="1792" height="1120" />
     </state>
     <state x="304" y="187" key="#com.intellij.execution.impl.EditConfigurationsDialog/0.0.1680.1050@0.0.1680.1050" timestamp="1592660389393" />
-    <state x="324" y="199" key="#com.intellij.execution.impl.EditConfigurationsDialog/0.0.1792.1120@0.0.1792.1120" timestamp="1593357981931" />
+    <state x="324" y="199" key="#com.intellij.execution.impl.EditConfigurationsDialog/0.0.1792.1120@0.0.1792.1120" timestamp="1593362951159" />
     <state x="567" y="356" key="#com.intellij.fileTypes.FileTypeChooser" timestamp="1593351783364">
       <screen x="0" y="0" width="1792" height="1120" />
     </state>
@@ -155,10 +155,10 @@
       <screen x="0" y="0" width="1792" height="1120" />
     </state>
     <state x="597" y="315" width="598" height="490" key="find.popup/0.0.1792.1120@0.0.1792.1120" timestamp="1593155990440" />
-    <state x="539" y="249" width="715" height="722" key="search.everywhere.popup" timestamp="1593359046927">
+    <state x="539" y="249" width="715" height="722" key="search.everywhere.popup" timestamp="1593364679767">
       <screen x="0" y="0" width="1792" height="1120" />
     </state>
     <state x="505" y="233" width="670" height="676" key="search.everywhere.popup/0.0.1680.1050@0.0.1680.1050" timestamp="1592844657664" />
-    <state x="539" y="249" width="715" height="722" key="search.everywhere.popup/0.0.1792.1120@0.0.1792.1120" timestamp="1593359046927" />
+    <state x="539" y="249" width="715" height="722" key="search.everywhere.popup/0.0.1792.1120@0.0.1792.1120" timestamp="1593364679767" />
   </component>
 </project>

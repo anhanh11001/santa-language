@@ -23,7 +23,7 @@ nextAddr NullMap = DirAddr startAddr
 getAddr (VarMap _ a _) = DirAddr a
 getAddr NullMap = DirAddr startAddr
 getAddrN (VarMap _ a _) = a
-startAddr = 5
+startAddr = 0
 
 maxThread = 4
 thr1 = DirAddr 0
@@ -283,23 +283,24 @@ mapBoolOp AndOp = And
 mapBoolOp OrOp = Or
 
 updateNumInstrs :: [Instruction] -> [Instruction]
-updateNumInstrs instrs = updateNumInstrs' (take (length zipAddrs - 1) zipAddrs) instrs
-  where addrs = sort $ nub $ usedAddr instrs []
-        zipAddrs = zip addrs [0..]
+updateNumInstrs instrs = updateNumInstrs' (zip (usedAddr instrs) [0..]) instrs
 updateNumInstrs' :: [(Int, Int)] -> [Instruction] -> [Instruction]
 updateNumInstrs' [] x = x
 updateNumInstrs' (x:y) z = updateNumInstrs' y (map (upInsNum x) z)
 
-usedAddr :: [Instruction] -> [Int] -> [Int]
-usedAddr [] x = x
-usedAddr (ins:y) x = case ins of (Load a _) -> next a
-                                 (Store _ a) -> next a
-                                 (ReadInstr a) -> next a
-                                 (WriteInstr _ a) -> next a
-                                 (TestAndSet a) -> next a
-                                 otherwise -> usedAddr y x
-  where next (DirAddr addr) = usedAddr y (x ++ [addr])
-        next _ = usedAddr y x
+usedAddr :: [Instruction] -> [Int]
+usedAddr instrs = take (length res - 1) res
+  where res = sort $ nub $ usedAddr' instrs []
+usedAddr' :: [Instruction] -> [Int] -> [Int]
+usedAddr' [] x = x
+usedAddr' (ins:y) x = case ins of (Load a _) -> next a
+                                  (Store _ a) -> next a
+                                  (ReadInstr a) -> next a
+                                  (WriteInstr _ a) -> next a
+                                  (TestAndSet a) -> next a
+                                  otherwise -> usedAddr' y x
+  where next (DirAddr addr) = usedAddr' y (x ++ [addr])
+        next _ = usedAddr' y x
 
 upInsNum :: (Int,Int) -> Instruction -> Instruction
 upInsNum (x,y) ins = case ins of (Load a b) -> (Load (f a) b)

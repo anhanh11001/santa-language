@@ -108,13 +108,13 @@ thread' = ThrCreate <$> (reserved "christmas create" *> identifier) <*> (braces 
 
 stmt :: Parser Stmt
 stmt =  VarDecStmt <$> varDec
-    <|> VarReDecStmt <$> varReDec
-    <|> WheStmt <$> whereP
-    <|> IfStmt <$> ifP
-    <|> LockStmt <$> lock
-    <|> ThreadStmt <$> thread
-    <|> PrintStmt <$> (spaces >> ((reserved "santa say") *> identifier))
-    <|> fmap (\_ -> ExitStmt) (spaces >> (reserved "santa die"))
+    <|> try (VarReDecStmt <$> varReDec)
+    <|> try (WheStmt <$> whereP)
+    <|> try (IfStmt <$> ifP)
+    <|> try (LockStmt <$> lock)
+    <|> try (ThreadStmt <$> thread)
+    <|> try (PrintStmt <$> (spaces >> ((reserved "santa say") *> identifier)))
+    <|> try (fmap (\_ -> ExitStmt) (spaces >> (reserved "santa die")))
     <?> "Fail on stmt"
 
 scope :: Parser Scope
