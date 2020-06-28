@@ -1,0 +1,13 @@
+
+santa make gift num sum = 0;
+
+christmas create addToSum {
+    santa make gift num i = 0;
+    santa go to factory when (i < 1000) {
+        santa change gift i = i + 1;
+        santa change gift sum = sum + 5;
+    };
+};
+christmas start addToSum;
+
+santa say sum;

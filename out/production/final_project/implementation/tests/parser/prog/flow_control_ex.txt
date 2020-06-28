@@ -1,0 +1,14 @@
+santa make gift num a = 12;
+
+santa check (13 < 14) then he do {
+    santa change gift a = 13;
+} otherwise he do {
+    santa change gift a = a * 6;
+};
+
+santa make gift num i = 0;
+santa make gift num sum = 0;
+santa go to factory when (i < 100) {
+    santa change gift sum = sum + i;
+    santa change gift i = i + 1;
+};

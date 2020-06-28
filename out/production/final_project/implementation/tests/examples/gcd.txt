@@ -1,0 +1,12 @@
+santa make gift num a = 363;
+santa make gift num b = 121;
+
+santa go to factory when (a != b) {
+    santa check (a > b) then he do {
+        santa change gift a = a - b;
+    } otherwise he do {
+        santa change gift b = b - a;
+    };
+};
+
+santa say b; // This is the result of gcd of numbers a and b

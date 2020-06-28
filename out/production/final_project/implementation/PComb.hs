@@ -11,12 +11,13 @@ languageDef =
             , Token.commentLine     = "//"
             , Token.identStart      = letter
             , Token.identLetter     = letter
-            , Token.reservedNames   = [ "santa_make_gift",
-                                        "santa_change_gift",
-                                        "santa_check", "then_he_do", "otherwise_he_do",
-                                        "santa_go_to_factory_when",
-                                        "christmas_create", "christmas_start", "christmas_stop",
-                                        "santa_lock_create", "santa_lock", "santa_unlock",
+            , Token.reservedNames   = [ "santa make gift",
+                                        "santa change gift",
+                                        "santa check", "then he do", "otherwise he do",
+                                        "santa go to factory when",
+                                        "santa say", "santa die",
+                                        "christmas create", "christmas start", "christmas stop",
+                                        "santa lock create", "santa lock", "santa unlock",
                                         "num", "bool", "char", "str",
                                         "true", "false"
                                       ]

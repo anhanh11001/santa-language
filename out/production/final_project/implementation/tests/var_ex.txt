@@ -1,8 +1,0 @@
-santa_make_gift num a = 12;
-santa_make_gift bool b = true;
-santa_make_gift num c = a * 24;
-santa_make_gift bool d = 13 >= 11;
-santa_make_gift bool e = b && d;
-santa_change_gift a = 13;
-santa_change_gift b = false;
-santa_change_gift e = b;

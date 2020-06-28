@@ -1,0 +1,8 @@
+santa make gift num a = 12;
+santa make gift bool b = true;
+santa make gift num c = a * 24;
+santa make gift bool d = 13 >= 11;
+santa make gift bool e = b && d;
+santa change gift a = 13;
+santa change gift b = false;
+santa change gift e = b;
