@@ -114,6 +114,7 @@ stmt =  VarDecStmt <$> varDec
     <|> LockStmt <$> lock
     <|> ThreadStmt <$> thread
     <|> PrintStmt <$> (spaces >> ((reserved "santa say") *> identifier))
+    <|> fmap (\_ -> ExitStmt) (spaces >> (reserved "santa die"))
     <?> "Fail on stmt"
 
 scope :: Parser Scope

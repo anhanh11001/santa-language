@@ -43,6 +43,7 @@ processElemToScope stmt buildingScope =
                (ThreadStmt thrStmt) -> processThread thrStmt buildingScope
                (LockStmt lockStmt) -> processLock lockStmt buildingScope
                (PrintStmt varName) -> processPrint varName buildingScope
+               ExitStmt -> buildingScope
 
 processThread :: Thread -> VarScope -> VarScope
 processThread thread scope = 

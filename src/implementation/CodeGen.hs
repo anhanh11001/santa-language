@@ -4,14 +4,13 @@ import Sprockell
 import LangDef
 import Debug.Trace
 
+type ThrAddr = AddrImmDI
+
 data VarMap = VarMap VarMap [VarMem]
             | NullMap deriving (Eq, Show)
 data VarMem = VarMem String AddrImmDI
             | MapMem VarMap
-            | ThrMem String AddrImmDI VarMap [Instruction] deriving (Eq, Show)
-            -- For thread variable: We have varMem1 = VarMem String AddrImmDI of the thread name
-            --                              varMem2 = MapMem VarMap of thread scope
-            --                              instrucions list = stored saved instructions list
+            | ThrMem String AddrImmDI VarMap [Instruction] ThrAddr deriving (Eq, Show)
 
 tempAddresses = 2
 temp1 = DirAddr 4
@@ -37,7 +36,7 @@ findVarMem varMem (VarMap motherMap (x:y)) = case x of (VarMem memName memAddr) 
 findThrMem :: String -> VarMap -> VarMem
 findThrMem thrName NullMap = error ("Cannot find " ++ thrName)
 findThrMem thrName (VarMap motherMap []) = findThrMem thrName motherMap
-findThrMem thrName (VarMap motherMap (x:y)) = case x of (ThrMem name a b c) -> if (thrName == name) then (ThrMem name a b c) else findNext
+findThrMem thrName (VarMap motherMap (x:y)) = case x of (ThrMem name a b c d) -> if (thrName == name) then (ThrMem name a b c d) else findNext
                                                         otherwise -> findNext
                                              where findNext = findThrMem thrName (VarMap motherMap y)
 
@@ -54,7 +53,7 @@ countThrU' :: VarMap -> [VarMem] -> Int
 countThrU' _ [] = 0
 countThrU' mapToAvoid (x:y) = case x of (VarMem _ _) -> next
                                         (MapMem map) -> if (map == mapToAvoid) then next else (countThrD map) + next
-                                        (ThrMem _ _ map _) -> if (map == mapToAvoid) then 1 + next else (countThrD map) + next + 1
+                                        (ThrMem _ _ map _ _) -> if (map == mapToAvoid) then 1 + next else (countThrD map) + next + 1
                               where next = countThrU' mapToAvoid y
 countThrD :: VarMap -> Int
 countThrD NullMap = 0
@@ -64,7 +63,7 @@ countThrD' :: [VarMem] -> Int
 countThrD' [] = 0
 countThrD' (x:y) = case x of (VarMem _ _) -> countThrD' y
                              (MapMem map) -> countThrD map
-                             (ThrMem _ _ map _) -> 1 + countThrD map
+                             (ThrMem _ _ map _ _) -> 1 + countThrD map
 
 countThrU :: VarMap -> VarMap -> Int
 countThrU map child = case map of NullMap -> 0
@@ -84,7 +83,7 @@ countMapU' :: VarMap -> [VarMem] -> Int
 countMapU' _ [] = 0
 countMapU' mapToAvoid (x:y) = case x of (VarMem _ _) -> 1 + next
                                         (MapMem map) ->  if (map == mapToAvoid) then next else (countMapD map) + next
-                                        (ThrMem _ _ map _) -> if (map == mapToAvoid) then 1 + next else (countMapD map) + next + 1
+                                        (ThrMem _ _ map _ _) -> if (map == mapToAvoid) then 1 + next else (countMapD map) + next + 1
                               where next = countMapU' mapToAvoid y
 countMapD :: VarMap -> Int
 countMapD NullMap = 0
@@ -94,7 +93,7 @@ countMapD' :: [VarMem] -> Int
 countMapD' [] = 0
 countMapD' (x:y) = case x of (VarMem _ _) -> 1 + (countMapD' y)
                              (MapMem map) -> countMapD map
-                             (ThrMem _ _ map _) -> 1 + countMapD map
+                             (ThrMem _ _ map _ _) -> 1 + countMapD map
 
 genCode :: Program -> [[Instruction]]
 genCode prog = genRP instrs (countThrD map + 1) []
@@ -119,6 +118,9 @@ genStmt stmt map = case stmt of (VarDecStmt (VarDec _ varName val)) -> genVarDec
                                 (LockStmt lockStmt) -> genLock map lockStmt
                                 (ThreadStmt thrStmt) -> genThread map thrStmt
                                 (PrintStmt varName) -> genVarPrint map varName
+                                ExitStmt -> (genExit, map)
+genExit :: [Instruction]
+genExit = [ EndProg ]
 
 genThread :: VarMap -> Thread -> ([Instruction], VarMap)
 genThread map thr = case thr of (ThrCreate thrName scope) -> genThrCreate map thrName scope
@@ -128,21 +130,18 @@ genThread map thr = case thr of (ThrCreate thrName scope) -> genThrCreate map th
 genThrCreate :: VarMap -> String -> Scope -> ([Instruction], VarMap)
 genThrCreate map thrName (Scope stmts) = ([], updatedMap)
   where updatedMap = storeVar thrMem map
-        thrMem = ThrMem thrName (nextThrAddr map scopeMap) scopeMap scopeInstrs
+        thrMem = ThrMem thrName (nextThrAddr map scopeMap) scopeMap scopeInstrs (nextAddr map) -- TODO: Check if there are any problems
         (scopeInstrs, scopeMap) = genInstrs' (VarMap map []) stmts []
 
 genThrStart :: VarMap -> String -> ([Instruction], VarMap)
 genThrStart map thrName = genThrStart' map (findThrMem thrName map)
 
 genThrStart' :: VarMap -> VarMem -> ([Instruction], VarMap)
-genThrStart' map (ThrMem _ addr _ instrs) = ([ Load (ImmValue ((\(DirAddr i) -> i) addr)) regA
-                                             , Compute NEq regA regSprID regA
-                                             , Branch regA (Rel (length instrs + 1)) ] ++ instrs
-                                             , map)
+genThrStart' map (ThrMem _ addr _ instrs thrAddr) = ([ ] , map) -- TODO
 
 genThrStop :: VarMap -> String -> ([Instruction], VarMap)
 genThrStop map thrName = ([], map) -- TODO
-  where (ThrMem _ addr map instrs) = findThrMem thrName map
+  where (ThrMem _ _ map _ _) = findThrMem thrName map
 
 genVarPrint :: VarMap -> String -> ([Instruction], VarMap)
 genVarPrint map varName = ([ Load (findVarMem varName map) regA , WriteInstr regA numberIO ], map)
@@ -241,7 +240,7 @@ genNum addr num = [ Load (ImmValue $ fromInteger $ num) regA
                   , Store regA addr]
 
 genBool :: AddrImmDI -> Bool -> [Instruction]
-genBool addr bool = [ Load (ImmValue $ (\x -> if x then 1 else 0) bool) regA,
+genBool addr bool = [ Load (ImmValue $ (\x -> if x then 1 else 0) bool) regA
                     , Store regA addr]
 
 genVar :: VarMap -> AddrImmDI -> String -> [Instruction]

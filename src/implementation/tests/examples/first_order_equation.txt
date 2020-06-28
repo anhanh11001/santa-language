@@ -1,0 +1,17 @@
+santa make gift num a = 2; // Changeable
+santa make gift num b = 3; // Changeable
+santa make gift num n = 7; // Changeable
+
+santa make gift num i = 0;
+
+santa go to factory when ((i * a) <= n) {
+    santa make gift num k = (n - (i*a)) / b;
+
+    santa check ((b * k + a * i) == n) then he do {
+        santa say k;
+        santa say i;
+        santa die;
+    };
+
+    santa change gift i = i + 1;
+};

@@ -1,24 +1,13 @@
 
 santa make gift num sum = 0;
-santa lock create sumLock;
 
 christmas create addToSum {
     santa make gift num i = 0;
     santa go to factory when (i < 1000) {
         santa change gift i = i + 1;
-        santa lock sumLock;
         santa change gift sum = sum + 5;
-        santa unlock sumLock;
     };
 };
 christmas start addToSum;
-
-santa make gift num i = 0;
-santa go to factory when (i < 1000) {
-    santa change gift i = i + 1;
-    santa lock sumLock;
-    santa change gift sum = sum + 5;
-    santa unlock sumLock;
-};
 
 santa say sum;

@@ -15,7 +15,7 @@ languageDef =
                                         "santa change gift",
                                         "santa check", "then he do", "otherwise he do",
                                         "santa go to factory when",
-                                        "santa say",
+                                        "santa say", "santa die",
                                         "christmas create", "christmas start", "christmas stop",
                                         "santa lock create", "santa lock", "santa unlock",
                                         "num", "bool", "char", "str",

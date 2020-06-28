@@ -12,6 +12,7 @@ data Stmt = VarDecStmt VarDec
           | LockStmt Lock
           | ThreadStmt Thread
           | PrintStmt String
+          | ExitStmt
           deriving (Eq, Show)
 
 data Thread = ThrCreate String Scope --
