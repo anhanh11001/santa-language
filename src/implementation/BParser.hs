@@ -115,6 +115,7 @@ stmt =  VarDecStmt <$> varDec
     <|> try (ThreadStmt <$> thread)
     <|> try (PrintStmt <$> (spaces >> ((reserved "santa say") *> identifier)))
     <|> try (fmap (\_ -> ExitStmt) (spaces >> (reserved "santa die")))
+    <|> try (ReturnStmt <$> (spaces >> (reserved "santa return" *> expr)))
     <?> "Fail on stmt"
 
 scope :: Parser Scope

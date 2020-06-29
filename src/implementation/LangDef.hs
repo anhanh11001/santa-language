@@ -12,6 +12,7 @@ data Stmt = VarDecStmt VarDec
           | LockStmt Lock
           | ThreadStmt Thread
           | PrintStmt String
+          | ReturnStmt Expr
           | ExitStmt
           deriving (Eq, Show)
 

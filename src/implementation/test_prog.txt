@@ -1,23 +1,15 @@
-
-santa make gift num fibNum = 10;
-santa make gift num a = 0;
-santa make gift num b = 1;
-
-santa check (fibNum == 0) then he do {
-    santa say a;
-    santa die;
+christmas create seasonOne {
+    santa return 20;
+};
+christmas create seasonTwo {
+    santa return 10;
 };
 
-santa check (fibNum == 1) then he do {
-    santa say b;
-    santa die;
-};
+christmas start seasonOne;
+christmas start seasonTwo;
 
-santa make gift num i = 2;
-santa go to factory when (i <= fibNum) {
-    santa make gift num c = a + b;
-    santa change gift a = b;
-    santa change gift b = c;
-    santa change gift i = i + 1;
-};
-santa say b;
+christmas stop seasonOne;
+christmas stop seasonTwo;
+
+santa say seasonOne;
+santa say seasonTwo;

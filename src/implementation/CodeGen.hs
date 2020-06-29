@@ -5,25 +5,30 @@ import LangDef
 import Debug.Trace
 import Data.List
 
-type ThrAddr = AddrImmDI
-type CurrentAddr = Int
+type CurAddr = Int
+type ThrAddr = Int
 
-data VarMap = VarMap VarMap CurrentAddr [VarMem]
+data VarMap = VarMap VarMap CurAddr ThrAddr [VarMem]
             | NullMap
             deriving (Eq, Show)
 data VarMem = VarMem String AddrImmDI
             | MapMem VarMap
-            | ThrMem String AddrImmDI VarMap [Instruction] ThrAddr
+            | ThrMem String AddrImmDI VarMap [Instruction] Int
             deriving (Eq, Show)
 
-mapNextAddr (VarMap a b c) = VarMap a (b+1) c
-mapNextAddr NullMap = VarMap NullMap startAddr []
-nextAddr (VarMap _ a _) = DirAddr (a + 1)
+startAddr = 5
+startThrAddr = 1
+mapNextAddr (VarMap a b c d) = VarMap a (b+1) c d
+mapNextAddr NullMap = VarMap NullMap startAddr 0 []
+mapNextThrAddr (VarMap a b c d) = VarMap a b (c+1) d
+nextAddr (VarMap _ a _ _) = DirAddr (a + 1)
 nextAddr NullMap = DirAddr startAddr
-getAddr (VarMap _ a _) = DirAddr a
+nextThrAddr (VarMap _ _ a _) = a + 1
+nextThrAddr NullMap = startThrAddr
+getAddr (VarMap _ a _ _) = DirAddr a
 getAddr NullMap = DirAddr startAddr
-getAddrN (VarMap _ a _) = a
-startAddr = 0
+getAddrN (VarMap _ a _ _) = a
+getThrN (VarMap _ _ a _) = a
 
 maxThread = 4
 thr1 = DirAddr 0
@@ -31,53 +36,43 @@ thr2 = DirAddr 1
 thr3 = DirAddr 2
 thr4 = DirAddr 3
 
---nextThrAddr map scopeMap = DirAddr $ (countThr map) + (countThrD scopeMap) + 1
-
 findVarMem :: String -> VarMap -> AddrImmDI
 findVarMem varNem NullMap = error ("Cannot find " ++ varNem)
-findVarMem varMem (VarMap motherMap _ []) = findVarMem varMem motherMap
-findVarMem varMem (VarMap motherMap a (x:y)) = case x of (VarMem memName memAddr) -> if (varMem == memName) then memAddr else findNext
-                                                         otherwise -> findNext
-                                             where findNext = findVarMem varMem (VarMap motherMap a y)
+findVarMem varMem (VarMap motherMap _ _ []) = findVarMem varMem motherMap
+findVarMem varMem (VarMap motherMap a t (x:y)) = case x of (VarMem memName memAddr) -> if (varMem == memName) then memAddr else findNext
+                                                           (ThrMem name addr _ _ _) -> if (varMem == name) then addr else findNext
+                                                           otherwise -> findNext
+                                                 where findNext = findVarMem varMem (VarMap motherMap a t y)
 
---findThrMem :: String -> VarMap -> VarMem
---findThrMem thrName NullMap = error ("Cannot find " ++ thrName)
---findThrMem thrName (VarMap motherMap []) = findThrMem thrName motherMap
---findThrMem thrName (VarMap motherMap (x:y)) = case x of (ThrMem name a b c d) -> if (thrName == name) then (ThrMem name a b c d) else findNext
---                                                        otherwise -> findNext
---                                             where findNext = findThrMem thrName (VarMap motherMap y)
+findThrMem :: String -> VarMap -> VarMem
+findThrMem thrName NullMap = error ("Cannot find " ++ thrName)
+findThrMem thrName (VarMap motherMap _ _ []) = findThrMem thrName motherMap
+findThrMem thrName (VarMap motherMap n t (x:y)) = case x of (ThrMem name a b c d) -> if (thrName == name) then (ThrMem name a b c d) else findNext
+                                                            otherwise -> findNext
+                                                  where findNext = findThrMem thrName (VarMap motherMap n t y)
 
 storeVar :: VarMem -> VarMap -> VarMap
-storeVar (VarMem str addr) NullMap = VarMap NullMap ((\(DirAddr x) -> x) addr) [VarMem str addr]
-storeVar (MapMem (VarMap mother addr l)) NullMap = VarMap NullMap addr [MapMem (VarMap mother addr l)]
-storeVar (VarMem str addr) (VarMap m curAddr l) = VarMap m curAddr (l ++ [VarMem str addr])
-storeVar (MapMem (VarMap m1 a1 l1)) (VarMap m2 a2 l2) = VarMap m2 (a1 + a2) (l2 ++ [MapMem (VarMap m1 a1 l1)])
---countThr :: VarMap -> Int
---countThr map = case map of NullMap -> 0
---                           (VarMap mother mem) -> (countThrD map) + (countThrU mother map)
---
---countThrU' :: VarMap -> [VarMem] -> Int
---countThrU' _ [] = 0
---countThrU' mapToAvoid (x:y) = case x of (VarMem _ _) -> next
---                                        (MapMem map) -> if (map == mapToAvoid) then next else (countThrD map) + next
---                                        (ThrMem _ _ map _ _) -> if (map == mapToAvoid) then 1 + next else (countThrD map) + next + 1
---                              where next = countThrU' mapToAvoid y
+storeVar (VarMem str addr) NullMap = VarMap NullMap ((\(DirAddr x) -> x) addr) 0 [VarMem str addr]
+storeVar (VarMem str addr) (VarMap m a t l) = VarMap m a t (l ++ [VarMem str addr])
+
+storeVar (MapMem (VarMap mother a t l)) NullMap = VarMap NullMap a t [MapMem (VarMap mother a t l)]
+storeVar (MapMem (VarMap m1 a1 t1 l1)) (VarMap m2 a2 t2 l2) = VarMap m2 a1 t1 (l2 ++ [MapMem (VarMap m1 a1 t1 l1)])
+
+storeVar (ThrMem str addr (VarMap m a t l) ins t2) NullMap = VarMap NullMap a 0 [ThrMem str addr (VarMap m a t l) ins t2]
+storeVar (ThrMem str addr (VarMap m1 a1 t l1) ins t2) (VarMap m2 a2 t3 l2) = VarMap m2 a1 (t3 + 1) (l2 ++ [ThrMem str addr (VarMap m1 a1 t l1) ins t2])
+
 countThrD :: VarMap -> Int
 countThrD NullMap = 0
-countThrD (VarMap _ _ mem) = countThrD' mem
+countThrD (VarMap a b c mem) = countThrD' mem
 
 countThrD' :: [VarMem] -> Int
 countThrD' [] = 0
 countThrD' (x:y) = case x of (VarMem _ _) -> countThrD' y
                              (MapMem map) -> countThrD map
-                             (ThrMem _ _ map _ _) -> 1 + countThrD map
---
---countThrU :: VarMap -> VarMap -> Int
---countThrU map child = case map of NullMap -> 0
---                                  (VarMap mother mem) -> (countThrU mother map) + (countThrU' child mem)
+                             (ThrMem _ _ map _ _) -> 1 + countThrD' y
 
 genCode :: Program -> [[Instruction]]
-genCode prog = genRP updatedInstrs (countThrD map + 1) []
+genCode prog = genRP instrs (countThrD map + 1) []
   where (instrs, map) = genInstrs prog
         updatedInstrs = updateNumInstrs instrs
         genRP _ 0 x = x
@@ -98,61 +93,69 @@ genStmt stmt map = case stmt of (VarDecStmt (VarDec _ varName val)) -> genVarDec
                                 (WheStmt (Where expr scope)) -> genWhere map expr scope
                                 (IfStmt ifStmt) -> genIf map ifStmt
 --                                (LockStmt lockStmt) -> genLock map lockStmt
---                                (ThreadStmt thrStmt) -> genThread map thrStmt
+                                (ThreadStmt thrStmt) -> genThread map thrStmt
                                 (PrintStmt varName) -> genVarPrint map varName
                                 ExitStmt -> (genExit, map)
+
+genThrInstrs :: AddrImmDI -> VarMap -> [Stmt] -> [Instruction] -> ([Instruction], VarMap)
+genThrInstrs addr map [] instrs = (instrs, map)
+genThrInstrs addr map (x:y) instrs = genThrInstrs addr map1 y (instrs ++ instr)
+  where (instr, map1) = genThrStmt addr x map
+
+genThrStmt :: AddrImmDI -> Stmt -> VarMap -> ([Instruction], VarMap)
+genThrStmt addr stmt map = case stmt of (VarDecStmt (VarDec _ varName val)) -> genVarDec map varName val
+                                        (VarReDecStmt (VarReDec varName val)) -> genVarReDec map varName val
+                                        (WheStmt (Where expr scope)) -> genWhere map expr scope
+                                        (IfStmt ifStmt) -> genIf map ifStmt
+                                        (ThreadStmt thrStmt) -> genThread map thrStmt
+                                        (PrintStmt varName) -> genVarPrint map varName
+                                        (ReturnStmt expr) -> genReturn map addr expr
+                                        ExitStmt -> (genExit, map)
+
 genExit :: [Instruction]
 genExit = [ EndProg ]
 
---genThread :: VarMap -> Thread -> ([Instruction], VarMap)
---genThread map thr = case thr of (ThrCreate thrName scope) -> genThrCreate map thrName scope
---                                (ThrStart thrName) -> genThrStart map thrName
---                                (ThrStop thrName) -> genThrStop map thrName
+genThread :: VarMap -> Thread -> ([Instruction], VarMap)
+genThread map thr = case thr of (ThrCreate thrName scope) -> genThrCreate map thrName scope
+                                (ThrStart thrName) -> genThrStart map thrName
+                                (ThrStop thrName) -> genThrStop map thrName
 
---genThrCreate :: VarMap -> String -> Scope -> ([Instruction], VarMap)
---genThrCreate map thrName (Scope stmts) = ([], updatedMap)
---  where updatedMap = storeVar thrMem map
---        thrMem = ThrMem thrName (nextThrAddr map scopeMap) scopeMap scopeInstrs (nextAddr map) -- TODO: Check if there are any problems
---        (scopeInstrs, scopeMap) = genInstrs' (VarMap map []) stmts []
---
---genThrStart :: VarMap -> String -> ([Instruction], VarMap)
---genThrStart map thrName = genThrStart' map (findThrMem thrName map)
---
---genThrStart' :: VarMap -> VarMem -> ([Instruction], VarMap)
---genThrStart' map (ThrMem _ addr _ instrs thrAddr) = ([ ] , map) -- TODO
---
---genThrStop :: VarMap -> String -> ([Instruction], VarMap)
---genThrStop map thrName = ([], map) -- TODO
---  where (ThrMem _ _ map _ _) = findThrMem thrName map
+genThrCreate :: VarMap -> String -> Scope -> ([Instruction], VarMap)
+genThrCreate map thrName (Scope stmts) = ([], map3)
+  where map1 = mapNextAddr $ map
+        (scopeInstrs, map2) = genThrInstrs (getAddr map1) (VarMap map1 (getAddrN map1) (getThrN map1) []) stmts []
+        thrMem = ThrMem thrName (getAddr map1) map2 scopeInstrs (nextThrAddr map1)
+        map3 = storeVar thrMem map1
+
+genThrStart :: VarMap -> String -> ([Instruction], VarMap)
+genThrStart map thrName = ([ Jump (Rel 2)
+                           , EndProg
+                           , Load (ImmValue thrNum) regA
+                           , Compute NEq regSprID regA regA
+                           , Branch regA (Rel (length instrs + 2))
+                           ] ++ instrs ++
+                           [ Jump (Rel ( - (length instrs) - 4)) ]
+                           , map)
+  where (ThrMem addr _ _ instrs thrNum) = findThrMem thrName map
+
+genReturn :: VarMap -> AddrImmDI -> Expr -> ([Instruction], VarMap)
+genReturn map addr expr = ( instrs ++
+                            [ Load (getAddr map1) regA
+                            , Load (ImmValue 2) regB
+                            , Compute Mul regB regSprID regB
+                            , WriteInstr regA (IndAddr regB)]
+                          , map1)
+  where (instrs, map1) = genExpr map expr
+
+genThrStop :: VarMap -> String -> ([Instruction], VarMap)
+genThrStop map thrName = ([ ReadInstr (DirAddr (thrNum * 2))
+                          , Receive regA
+                          , Store regA addr ]
+                          , map)
+  where (ThrMem _ addr _ _ thrNum) = findThrMem thrName map
 
 genVarPrint :: VarMap -> String -> ([Instruction], VarMap)
 genVarPrint map varName = ([ Load (findVarMem varName map) regA , WriteInstr regA numberIO ], map)
-
---genLock :: VarMap -> Lock -> ([Instruction], VarMap)
---genLock varMap lock = case lock of (LckCreate lockName) -> genLockCreate varMap lockName
---                                   (LckLock lockName) -> genLockLock varMap lockName
---                                   (LckUnlock lockName) -> genLockUnlock varMap lockName
---
---genLockCreate :: VarMap -> String -> ([Instruction], VarMap)
---genLockCreate varMap lockName = (instrs, newVarMap)
---  where instrs = [Load (ImmValue 0) regA
---                 , Store regA addr]
---        newVarMap = storeVar (VarMem lockName addr) varMap
---        addr = nextAddr varMap
---
---genLockLock :: VarMap -> String -> ([Instruction], VarMap)
---genLockLock varMap lockName = (instrs, varMap)
---  where instrs = [ TestAndSet (findVarMem lockName varMap)
---                 , Receive regA
---                 , Load (ImmValue 1) regB
---                 , Compute Sub regB regA regA
---                 , Branch regA (Rel (-4))
---                 ]
---
---genLockUnlock :: VarMap -> String -> ([Instruction], VarMap)
---genLockUnlock varMap lockName = (instrs, varMap)
---  where instrs = [ Load (ImmValue 0) regA
---                 , WriteInstr regA (findVarMem lockName varMap)]
 
 genVarDec :: VarMap -> String -> Expr -> ([Instruction], VarMap)
 genVarDec map varName expr = (instrs, map2)
@@ -176,7 +179,7 @@ genWhere map expr (Scope stmts) = ( exprInstrs ++
                                     [ Jump (Rel (- (length scopeInstrs) - 4 - (length exprInstrs))) ]
                                     , map3)
   where (exprInstrs, map1) = genExpr map expr
-        (scopeInstrs, map2) = genInstrs' (VarMap map1 (getAddrN map1) []) stmts []
+        (scopeInstrs, map2) = genInstrs' (VarMap map1 (getAddrN map1) (getThrN map1) []) stmts []
         map3 = storeVar (MapMem map2) map1
 
 
@@ -195,9 +198,9 @@ genIfOne map expr (Scope stmts1) (Scope stmts2) = ( exprInstrs ++
                                                     scopeInstrs2
                                                   , map5 )
   where (exprInstrs, map1) = genExpr map expr
-        (scopeInstrs1, map2) = genInstrs' (VarMap map1 (getAddrN map1) []) stmts1 []
+        (scopeInstrs1, map2) = genInstrs' (VarMap map1 (getAddrN map1) (getThrN map1) []) stmts1 []
         map3 = storeVar (MapMem map2) map1
-        (scopeInstrs2, map4) = genInstrs' (VarMap map3 (getAddrN map3) []) stmts2 []
+        (scopeInstrs2, map4) = genInstrs' (VarMap map3 (getAddrN map3) (getThrN map3) []) stmts2 []
         map5 = storeVar (MapMem map4) map3
 
 
@@ -210,7 +213,7 @@ genIfTwo map expr (Scope stmts) = ( exprInstrs ++
                                     scopeInstrs
                                   , map3)
   where (exprInstrs, map1) = genExpr map expr
-        (scopeInstrs, map2) = genInstrs' (VarMap map1 (getAddrN map1) []) stmts []
+        (scopeInstrs, map2) = genInstrs' (VarMap map1 (getAddrN map1) (getThrN map1) []) stmts []
         map3 = storeVar (MapMem map2) map1
 
 
@@ -311,3 +314,30 @@ upInsNum (x,y) ins = case ins of (Load a b) -> (Load (f a) b)
                                  otherwise -> ins
   where f (DirAddr addr) = if x == addr then DirAddr y else (DirAddr addr)
         f m = m
+
+
+--genLock :: VarMap -> Lock -> ([Instruction], VarMap)
+--genLock varMap lock = case lock of (LckCreate lockName) -> genLockCreate varMap lockName
+--                                   (LckLock lockName) -> genLockLock varMap lockName
+--                                   (LckUnlock lockName) -> genLockUnlock varMap lockName
+--
+--genLockCreate :: VarMap -> String -> ([Instruction], VarMap)
+--genLockCreate varMap lockName = (instrs, newVarMap)
+--  where instrs = [Load (ImmValue 0) regA
+--                 , Store regA addr]
+--        newVarMap = storeVar (VarMem lockName addr) varMap
+--        addr = nextAddr varMap
+--
+--genLockLock :: VarMap -> String -> ([Instruction], VarMap)
+--genLockLock varMap lockName = (instrs, varMap)
+--  where instrs = [ TestAndSet (findVarMem lockName varMap)
+--                 , Receive regA
+--                 , Load (ImmValue 1) regB
+--                 , Compute Sub regB regA regA
+--                 , Branch regA (Rel (-4))
+--                 ]
+--
+--genLockUnlock :: VarMap -> String -> ([Instruction], VarMap)
+--genLockUnlock varMap lockName = (instrs, varMap)
+--  where instrs = [ Load (ImmValue 0) regA
+--                 , WriteInstr regA (findVarMem lockName varMap)]
