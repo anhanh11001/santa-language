@@ -9,34 +9,50 @@ import Data.List
 -- CodeGen data class/data structure to store information about the program and used to help generating instructions
 -- ==========================================================================================================
 
-type CurAddr = Int
-type ThrAddr = Int
+type LocalAddr = Int -- from 8 to beyond
+type SharedAddr = Int -- from 4 to 7
+type ThrAddr = Int -- from 1 to 3 (0 is the default shared memory for main thread)
 
-data VarMap = VarMap VarMap CurAddr [VarMem]
+data VarMap = VarMap VarMap LocalAddr SharedAddr [VarMem]
             | NullMap
             deriving (Eq, Show)
-data VarMem = VarMem String AddrImmDI
-            | VarSharedMem String AddrImmDI
+data VarMem = LocalMem String AddrImmDI
+            | SharedMem String AddrImmDI
+            | ThrMem
             | MapMem VarMap
             deriving (Eq, Show)
 
-startAddr = 5
-mapNextAddr (VarMap a b c) = VarMap a (b+1) c
-mapNextAddr NullMap = VarMap NullMap startAddr []
-nextAddr (VarMap _ a _) = DirAddr (a + 1)
-nextAddr NullMap = DirAddr startAddr
-getAddr (VarMap _ a _) = DirAddr a
-getAddr NullMap = DirAddr startAddr
-getAddrN (VarMap _ a _) = a
+notCreatedAddr = -1
+startLA = 0
+startSA = 4
+startTA = 1
+
+mapNextLA (VarMap a b c d) = VarMap a next c d
+  where next = if b == notCreatedAddr then startLA else b + 1
+mapNextLA NullMap = VarMap NullMap startLA notCreatedAddr []
+
+mapNextSA (VarMap a b c d) = VarMap a b next d
+  where next = if c == notCreatedAddr then startSA else c + 1
+mapNextSA NullMap = VarMap NullMap notCreatedAddr startSA []
+
+nextLA (VarMap _ a _ _) = DirAddr (a + 1)
+nextLA NullMap = DirAddr startLA
+
+getLA (VarMap _ a _ _) = DirAddr a
+getLA NullMap = DirAddr startLA
+getSA (VarMap _ _ a _) = DirAddr a
+getSA (NullMap) = DirAddr startSA
+
+lAddr (VarMap _ a _ _) = a
+sAddr (VarMap _ _ a _) = a
 
 -- ==========================================================================================================
 -- Main function used to generate instructions for a program
 -- ==========================================================================================================
 
 genCode :: Program -> [[Instruction]]
-genCode prog = genRP updatedInstrs (countThrNum prog + 1) []
+genCode prog = genRP instrs (countThrNum prog + 1) []
   where (instrs, map) = genInstrs prog
-        updatedInstrs = updateNumInstrs instrs
         genRP _ 0 x = x
         genRP l num x = genRP l (num - 1) (l : x)
 
@@ -73,35 +89,38 @@ genStmt stmt map = case stmt of (VarDecStmt (VarDec _ varName val)) -> genVarDec
 -- ==========================================================================================================
 
 genVarDec :: VarMap -> String -> Expr -> ([Instruction], VarMap)
-genVarDec map varName expr = (instrs, map2)
+genVarDec map varName expr = (instrs ++ [ Load (getLA map1) regA, Store regA (getLA map2)], map3)
   where (instrs, map1) = genExpr map expr
-        map2 = storeVar (VarMem varName (getAddr map1)) map1
+        map2 = mapNextLA map
+        map3 = storeVar (LocalMem varName (getLA map2)) map2
 
 genVarDecSpecial :: VarMap -> String -> Expr -> ([Instruction], VarMap)
-genVarDecSpecial map varName expr = (instrs, map2)
+genVarDecSpecial map varName expr = (instrs ++ [ Load (getLA map1) regA, WriteInstr regA (getSA map2)], map3)
   where (instrs, map1) = genExpr map expr
-        map2 = storeVar (VarMem varName (getAddr map1)) map1
+        map2 = mapNextSA map
+        map3 = storeVar (SharedMem varName (getSA map2)) map2
 
 genVarReDec :: VarMap -> String -> Expr -> ([Instruction], VarMap)
-genVarReDec map varName expr = (instrs ++
-                                [ Load (getAddr map1) regA
-                                , Store regA varMem ], map1)
-  where varMem = findVarMem varName map
+genVarReDec map varName expr = (instrs ++ varReDecInstrs, map)
+  where varReDecInstrs = if shared then sharedInstrs else localInstrs
+        sharedInstrs = [ Load (getLA map1) regA, WriteInstr regA mem ]
+        localInstrs = [ Load (getLA map1) regA, Store regA mem ]
+        (mem, shared) = findVarMem varName map
         (instrs, map1) = genExpr map expr
 
 
 genWhere :: VarMap -> Expr -> Scope -> ([Instruction], VarMap)
 genWhere map expr (Scope stmts) = ( exprInstrs ++
                                     [ Load (ImmValue 1) regA,
-                                      Load (getAddr map1) regB,
+                                      Load (getLA map1) regB,
                                       Compute Sub regA regB regB,
                                       Branch regB (Rel (length scopeInstrs + 2)) ] ++
                                     scopeInstrs ++
                                     [ Jump (Rel (- (length scopeInstrs) - 4 - (length exprInstrs))) ]
                                     , map3)
   where (exprInstrs, map1) = genExpr map expr
-        (scopeInstrs, map2) = genInstrs' (VarMap map1 (getAddrN map1) []) stmts []
-        map3 = storeVar (MapMem map2) map1
+        (scopeInstrs, map2) = genInstrs' (VarMap map (lAddr map) (sAddr map) []) stmts []
+        map3 = storeVar (MapMem map2) map
 
 genIf :: VarMap -> If -> ([Instruction], VarMap)
 genIf map ifStmt = case ifStmt of (IfOne expr scope1 scope2) -> genIfOne map expr scope1 scope2
@@ -110,7 +129,7 @@ genIf map ifStmt = case ifStmt of (IfOne expr scope1 scope2) -> genIfOne map exp
 genIfOne :: VarMap -> Expr -> Scope -> Scope -> ([Instruction], VarMap)
 genIfOne map expr (Scope stmts1) (Scope stmts2) = ( exprInstrs ++
                                                     [ Load (ImmValue 1) regA,
-                                                      Load (getAddr map1) regB,
+                                                      Load (getLA map1) regB,
                                                       Compute Sub regA regB regB,
                                                       Branch regB (Rel (length scopeInstrs1 + 2)) ] ++
                                                     scopeInstrs1 ++
@@ -118,22 +137,22 @@ genIfOne map expr (Scope stmts1) (Scope stmts2) = ( exprInstrs ++
                                                     scopeInstrs2
                                                   , map5 )
   where (exprInstrs, map1) = genExpr map expr
-        (scopeInstrs1, map2) = genInstrs' (VarMap map1 (getAddrN map1) []) stmts1 []
-        map3 = storeVar (MapMem map2) map1
-        (scopeInstrs2, map4) = genInstrs' (VarMap map3 (getAddrN map3) []) stmts2 []
+        (scopeInstrs1, map2) = genInstrs' (VarMap map (lAddr map) (sAddr map) []) stmts1 []
+        map3 = storeVar (MapMem map2) map
+        (scopeInstrs2, map4) = genInstrs' (VarMap map3 (lAddr map3) (sAddr map3) []) stmts2 []
         map5 = storeVar (MapMem map4) map3
 
 
 genIfTwo :: VarMap -> Expr -> Scope -> ([Instruction], VarMap)
 genIfTwo map expr (Scope stmts) = ( exprInstrs ++
                                     [ Load (ImmValue 1) regA
-                                    , Load (getAddr map1) regB
+                                    , Load (getLA map1) regB
                                     , Compute Sub regA regB regB
                                     , Branch regB (Rel (length scopeInstrs + 1))] ++
                                     scopeInstrs
                                   , map3)
   where (exprInstrs, map1) = genExpr map expr
-        (scopeInstrs, map2) = genInstrs' (VarMap map1 (getAddrN map1) []) stmts []
+        (scopeInstrs, map2) = genInstrs' (VarMap map1 (lAddr map) (sAddr map) []) stmts []
         map3 = storeVar (MapMem map2) map1
 
 
@@ -156,12 +175,12 @@ genLockCreate :: VarMap -> String -> ([Instruction], VarMap)
 genLockCreate varMap lockName = (instrs, newVarMap)
   where instrs = [Load (ImmValue 0) regA
                  , Store regA addr]
-        newVarMap = storeVar (VarMem lockName addr) varMap
-        addr = nextAddr varMap
+        newVarMap = storeVar (SharedMem lockName addr) varMap
+        addr = nextLA varMap
 
 genLockLock :: VarMap -> String -> ([Instruction], VarMap)
-genLockLock varMap lockName = (instrs, varMap)
-  where instrs = [ TestAndSet (findVarMem lockName varMap)
+genLockLock map lockName = (instrs, map)
+  where instrs = [ TestAndSet (fst $ findVarMem lockName map)
                  , Receive regA
                  , Load (ImmValue 1) regB
                  , Compute Sub regB regA regA
@@ -171,10 +190,13 @@ genLockLock varMap lockName = (instrs, varMap)
 genLockUnlock :: VarMap -> String -> ([Instruction], VarMap)
 genLockUnlock varMap lockName = (instrs, varMap)
   where instrs = [ Load (ImmValue 0) regA
-                 , WriteInstr regA (findVarMem lockName varMap)]
+                 , WriteInstr regA (fst$ findVarMem lockName varMap)]
 
 genVarPrint :: VarMap -> String -> ([Instruction], VarMap)
-genVarPrint map varName = ([ Load (findVarMem varName map) regA , WriteInstr regA numberIO ], map)
+genVarPrint map varName = (if shared then sharedInstrs else localInstrs, map)
+  where localInstrs = [ Load mem regA , WriteInstr regA numberIO ]
+        sharedInstrs = [ ReadInstr mem , Receive regA, WriteInstr regA numberIO ]
+        (mem, shared) = findVarMem varName map
 
 genExit :: [Instruction]
 genExit = [ EndProg ]
@@ -194,42 +216,44 @@ genExpr map expr = case expr of (NumExp val) -> genNum map val
 
 genNum :: VarMap -> Integer -> ([Instruction], VarMap)
 genNum map num = ([ Load (ImmValue $ fromInteger $ num) regA
-                  , Store regA (nextAddr map)], mapNextAddr map)
+                  , Store regA (nextLA map)], mapNextLA map)
 
 genBool :: VarMap -> Bool -> ([Instruction], VarMap)
 genBool map bool = ([ Load (ImmValue $ (\x -> if x then 1 else 0) bool) regA
-                    , Store regA (nextAddr map)], mapNextAddr map)
+                    , Store regA (nextLA map)], mapNextLA map)
 
 genVar :: VarMap -> String -> ([Instruction], VarMap)
-genVar map var =  ([ Load (findVarMem var map) regA
-                       , Store regA (nextAddr map)], mapNextAddr map)
+genVar map var =  ( if shared then sharedInstrs else localInstrs, mapNextLA map)
+  where localInstrs = [ Load mem regA, Store regA (nextLA map) ]
+        sharedInstrs = [ ReadInstr mem, Receive regA, Store regA (nextLA map) ]
+        (mem, shared) = findVarMem var map
 
 genNumCalc :: VarMap -> Expr -> CalcOp -> Expr -> ([Instruction], VarMap)
 genNumCalc map ex1 op ex2
     | op `elem` [AddOp, SubOp, Mult] = genCalc map ex1 (mapCalcOp op) ex2
     | otherwise =  (instrs1 ++
                    instrs2 ++
-                   [ Load (getAddr map1) regA
-                   , Load (getAddr map2) regB
+                   [ Load (getLA map1) regA
+                   , Load (getLA map2) regB
                    , Load (ImmValue 0) regC
                    , Compute Lt regA regB regD
                    , Branch regD (Rel 4)
                    , Compute Sub regA regB regA
                    , Compute Incr regC regC regC
                    , Jump (Rel (-4))
-                   , Store regC (nextAddr map2)
-                   ], mapNextAddr map2)
+                   , Store regC (nextLA map)
+                   ], mapNextLA map)
                    where (instrs1, map1) = (genExpr map ex1)
                          (instrs2, map2) = (genExpr map1 ex2)
 
 genCalc :: VarMap-> Expr -> Operator -> Expr -> ([Instruction], VarMap)
 genCalc map ex1 op ex2 = ( instrs1 ++
                            instrs2 ++
-                          [ Load (getAddr map1) regA
-                          , Load (getAddr map2) regB
+                          [ Load (getLA map1) regA
+                          , Load (getLA map2) regB
                           , Compute op regA regB regC
-                          , Store regC (nextAddr map2)
-                          ], mapNextAddr map2)
+                          , Store regC (nextLA map)
+                          ], mapNextLA map)
                           where (instrs1, map1) = (genExpr map ex1)
                                 (instrs2, map2) = (genExpr map1 ex2)
 
@@ -237,18 +261,24 @@ genCalc map ex1 op ex2 = ( instrs1 ++
 -- Helpers functions to generate instructions
 -- ==========================================================================================================
 
-findVarMem :: String -> VarMap -> AddrImmDI
+findVarMem :: String -> VarMap -> (AddrImmDI, Bool)
 findVarMem varNem NullMap = error ("Cannot find " ++ varNem)
-findVarMem varMem (VarMap motherMap _ []) = findVarMem varMem motherMap
-findVarMem varMem (VarMap motherMap a (x:y)) = case x of (VarMem memName memAddr) -> if (varMem == memName) then memAddr else findNext
-                                                         otherwise -> findNext
-                                               where findNext = findVarMem varMem (VarMap motherMap a y)
+findVarMem varMem (VarMap motherMap _ _ []) = findVarMem varMem motherMap
+findVarMem varMem (VarMap motherMap a s (x:y)) = case x of (LocalMem memName memAddr) -> if (varMem == memName) then (memAddr, False) else findNext
+                                                           (SharedMem memName memAddr) -> if (varMem == memName) then (memAddr, True) else findNext
+                                                           otherwise -> findNext
+                                               where findNext = findVarMem varMem (VarMap motherMap a s y)
 
 storeVar :: VarMem -> VarMap -> VarMap
-storeVar (VarMem str addr) NullMap = VarMap NullMap ((\(DirAddr x) -> x) addr) [VarMem str addr]
-storeVar (VarMem str addr) (VarMap m a l) = VarMap m a (l ++ [VarMem str addr])
-storeVar (MapMem (VarMap mother a l)) NullMap = VarMap NullMap a [MapMem (VarMap mother a l)]
-storeVar (MapMem (VarMap m1 a1 l1)) (VarMap m2 a2 l2) = VarMap m2 a1 (l2 ++ [MapMem (VarMap m1 a1 l1)])
+storeVar (LocalMem str addr) NullMap = VarMap NullMap (dirToAddr addr) notCreatedAddr [LocalMem str addr]
+storeVar (LocalMem str addr) (VarMap m a s l) = VarMap m a s (l ++ [LocalMem str addr])
+storeVar (MapMem (VarMap mother a s l)) NullMap = VarMap NullMap a s [MapMem (VarMap mother a s l)]
+storeVar (MapMem (VarMap m1 a1 s1 l1)) (VarMap m2 a2 s2 l2) = VarMap m2 a1 s1 (l2 ++ [MapMem (VarMap m1 a1 s1 l1)])
+storeVar (SharedMem str addr) NullMap = VarMap NullMap notCreatedAddr (dirToAddr addr) [SharedMem str addr]
+storeVar (SharedMem str addr) (VarMap m a s l) = VarMap m a s (l ++ [SharedMem str addr])
+
+dirToAddr addr = case addr of (DirAddr x) -> x
+                              otherwise -> error "Invalid addr"
 
 countThrNum :: Program -> Integer
 countThrNum (Program stmts) = countThrNum' stmts 0
@@ -278,38 +308,3 @@ mapCalcOp Mult = Mul
 mapBoolOp :: BoolOp -> Operator
 mapBoolOp AndOp = And
 mapBoolOp OrOp = Or
-
--- ==========================================================================================================
--- Optimizations on memory management
--- ==========================================================================================================
-
-updateNumInstrs :: [Instruction] -> [Instruction]
-updateNumInstrs instrs = updateNumInstrs' zipped instrs
-  where zipped = (zip (usedAddr instrs) [0..])
-updateNumInstrs' :: [(Int, Int)] -> [Instruction] -> [Instruction]
-updateNumInstrs' [] x = x
-updateNumInstrs' (x:y) z = updateNumInstrs' y (map (upInsNum x) z)
-
-usedAddr :: [Instruction] -> [Int]
-usedAddr instrs = take (length res - 1) res
-  where res = sort $ nub $ usedAddr' instrs []
-usedAddr' :: [Instruction] -> [Int] -> [Int]
-usedAddr' [] x = x
-usedAddr' (ins:y) x = case ins of (Load a _) -> next a
-                                  (Store _ a) -> next a
-                                  (ReadInstr a) -> next a
-                                  (WriteInstr _ a) -> next a
-                                  (TestAndSet a) -> next a
-                                  otherwise -> usedAddr' y x
-  where next (DirAddr addr) = usedAddr' y (x ++ [addr])
-        next _ = usedAddr' y x
-
-upInsNum :: (Int,Int) -> Instruction -> Instruction
-upInsNum (x,y) ins = case ins of (Load a b) -> (Load (f a) b)
-                                 (Store a b) -> (Store a (f b))
-                                 (ReadInstr a) -> ReadInstr (f a)
-                                 (WriteInstr a b) -> WriteInstr a (f b)
-                                 (TestAndSet a) -> TestAndSet (f a)
-                                 otherwise -> ins
-  where f (DirAddr addr) = if x == addr then DirAddr y else (DirAddr addr)
-        f m = m

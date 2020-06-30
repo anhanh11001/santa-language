@@ -1,5 +1,5 @@
-santa make gift num a = 363;
-santa make gift num b = 121;
+santa make special gift num a = 363;
+santa make special gift num b = 121;
 
 santa go to factory when (a != b) {
     santa check (a > b) then he do {

@@ -17,4 +17,5 @@ runProg fileName = do
   let typeScopePrint = prettyTypeScope scopeChecked
   let genInstrs = genCode compiledAST
   run genInstrs
+--  runWithDebugger (debuggerSimplePrintAndWait myShow) genInstrs
 
