@@ -1,15 +1,28 @@
 christmas create seasonOne {
-    santa return 20;
+    santa make gift num i = 0;
+    santa make gift num sum = 0;
+    santa go to factory when (i < 10) {
+        santa change gift sum = sum + i;
+        santa change gift i = i + 1;
+    };
+    santa return sum;
 };
 christmas create seasonTwo {
-    santa return 10;
+    santa make gift num i = 0;
+    santa make gift num sum = 0;
+    santa go to factory when (i < 10) {
+        santa change gift sum = sum + i;
+        santa change gift i = i + 1;
+    };
+    santa return sum;
 };
 
 christmas start seasonOne;
 christmas start seasonTwo;
 
-christmas stop seasonOne;
-christmas stop seasonTwo;
+santa make gift num sum = 45;
 
-santa say seasonOne;
+christmas stop seasonTwo;
+christmas stop seasonOne;
+
 santa say seasonTwo;

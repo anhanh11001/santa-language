@@ -1,0 +1,16 @@
+
+santa make special gift a = 10;
+santa lock create sumLock;
+
+christmas start seasonOne {
+    santa lock sumLock;
+    santa change gift a = a + 100;
+    santa unlock sumLock;
+};
+
+santa lock sumLock;
+santa change gift a = a + 200;
+santa unlock sumLock;
+christmas stop seasonOne;
+
+santa say a; // This should call 310 ALWAYS
