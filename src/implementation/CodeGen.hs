@@ -18,7 +18,7 @@ data VarMap = VarMap VarMap LocalAddr SharedAddr [VarMem]
             deriving (Eq, Show)
 data VarMem = LocalMem String AddrImmDI
             | SharedMem String AddrImmDI
-            | ThrMem
+            | ThrMem String AddrImmDI
             | MapMem VarMap
             deriving (Eq, Show)
 
@@ -35,8 +35,10 @@ mapNextSA (VarMap a b c d) = VarMap a b next d
   where next = if c == notCreatedAddr then startSA else c + 1
 mapNextSA NullMap = VarMap NullMap notCreatedAddr startSA []
 
-nextLA (VarMap _ a _ _) = DirAddr (a + 1)
+nextLA (VarMap _ a _ _) = DirAddr (if a == notCreatedAddr then startLA else a + 1)
 nextLA NullMap = DirAddr startLA
+nextSA (VarMap _ _ a _) = DirAddr (if a == notCreatedAddr then startSA else a + 1)
+nextSA NullMap = DirAddr startSA
 
 getLA (VarMap _ a _ _) = DirAddr a
 getLA NullMap = DirAddr startLA
@@ -51,7 +53,7 @@ sAddr (VarMap _ _ a _) = a
 -- ==========================================================================================================
 
 genCode :: Program -> [[Instruction]]
-genCode prog = genRP instrs (countThrNum prog + 1) []
+genCode prog = trace (show instrs) (genRP instrs (countThrNum prog + 1) [])
   where (instrs, map) = genInstrs prog
         genRP _ 0 x = x
         genRP l num x = genRP l (num - 1) (l : x)
@@ -172,11 +174,9 @@ genLock varMap lock = case lock of (LckCreate lockName) -> genLockCreate varMap 
                                    (LckUnlock lockName) -> genLockUnlock varMap lockName
 
 genLockCreate :: VarMap -> String -> ([Instruction], VarMap)
-genLockCreate varMap lockName = (instrs, newVarMap)
-  where instrs = [Load (ImmValue 0) regA
-                 , Store regA addr]
-        newVarMap = storeVar (SharedMem lockName addr) varMap
-        addr = nextLA varMap
+genLockCreate map lockName = ([Load (ImmValue 0) regA, WriteInstr regA addr], map1)
+  where map1 = storeVar (SharedMem lockName addr) map
+        addr = nextSA map
 
 genLockLock :: VarMap -> String -> ([Instruction], VarMap)
 genLockLock map lockName = (instrs, map)
@@ -190,7 +190,7 @@ genLockLock map lockName = (instrs, map)
 genLockUnlock :: VarMap -> String -> ([Instruction], VarMap)
 genLockUnlock varMap lockName = (instrs, varMap)
   where instrs = [ Load (ImmValue 0) regA
-                 , WriteInstr regA (fst$ findVarMem lockName varMap)]
+                 , WriteInstr regA (fst $ findVarMem lockName varMap)]
 
 genVarPrint :: VarMap -> String -> ([Instruction], VarMap)
 genVarPrint map varName = (if shared then sharedInstrs else localInstrs, map)
@@ -272,10 +272,10 @@ findVarMem varMem (VarMap motherMap a s (x:y)) = case x of (LocalMem memName mem
 storeVar :: VarMem -> VarMap -> VarMap
 storeVar (LocalMem str addr) NullMap = VarMap NullMap (dirToAddr addr) notCreatedAddr [LocalMem str addr]
 storeVar (LocalMem str addr) (VarMap m a s l) = VarMap m a s (l ++ [LocalMem str addr])
-storeVar (MapMem (VarMap mother a s l)) NullMap = VarMap NullMap a s [MapMem (VarMap mother a s l)]
-storeVar (MapMem (VarMap m1 a1 s1 l1)) (VarMap m2 a2 s2 l2) = VarMap m2 a1 s1 (l2 ++ [MapMem (VarMap m1 a1 s1 l1)])
 storeVar (SharedMem str addr) NullMap = VarMap NullMap notCreatedAddr (dirToAddr addr) [SharedMem str addr]
 storeVar (SharedMem str addr) (VarMap m a s l) = VarMap m a s (l ++ [SharedMem str addr])
+storeVar (MapMem (VarMap mother a s l)) NullMap = VarMap NullMap a s [MapMem (VarMap mother a s l)]
+storeVar (MapMem (VarMap m1 a1 s1 l1)) (VarMap m2 a2 s2 l2) = VarMap m2 a1 s1 (l2 ++ [MapMem (VarMap m1 a1 s1 l1)])
 
 dirToAddr addr = case addr of (DirAddr x) -> x
                               otherwise -> error "Invalid addr"

@@ -1,10 +1,10 @@
 santa make gift num a = 10;
-santa make gift num i = 0;
 
-santa go to factory when (i == 0) {
-    santa make gift num k = 2;
-    santa change gift i = 1;
-};
-santa make gift num b = a * 20 + 5;
 
-santa make gift num c = 20;
+santa lock create newLock;
+
+santa lock newLock;
+santa change gift a = 20;
+santa unlock newLock;
+
+santa say a;
