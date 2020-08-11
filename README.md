@@ -1,11 +1,9 @@
 # SANTA
 
-########################################################################################################################
 Santa is a simple programming language created with Haskell. It is written by Le Tran Anh Duc for the final project
 of Programming Paradigm module in University of Twente.
 
-########################################################################################################################
-FEATURES
+## FEATURES
 
 - Variable (re)declaration (Local and shared memories)
 - Simple arithmetic/logic/comparison operations
@@ -15,8 +13,7 @@ FEATURES
 
 More instructions can be found inside the files.
 
-########################################################################################################################
-PREREQUISITES
+## PREREQUISITES
 
 To run the program, please set up the following software/environment
 - Glasgow Haskell Compiler
@@ -25,8 +22,7 @@ To run the program, please set up the following software/environment
 To run the files, start with the current directory `implementation` and go to the Glasgow Haskell Compiler environment
 with `ghci`
 
-########################################################################################################################
-FILE STRUCTURES
+## FILE STRUCTURES
 - implementation/
     - tests/
         - errors/                                                       -- * Containing all error programs that raise error when compile
@@ -58,8 +54,7 @@ For example: `:l tests/parser/unit/BoolOp` and `run`
 To run the program test in test/ folder, see instruction inside prog/fileName.hs to compile and call `run`
 For example: `:l tests/parser/prog/Program` and `run0`
 
-########################################################################################################################
-EXAMPLES
+## EXAMPLES
 There are a number of demo programs showing various features in file tests/examples/Run.hs . To run this file,use
 ':l tests/examples/Run' and call runProg <fileName> with the desired program. See more description on that file
 
@@ -69,9 +64,6 @@ gcd.txt - Greatest common divisor algorithm
 first_order_equation.txt - A simple program that find solution for first order equation
 peterson.txt - Peterson algorithm
 
-########################################################################################################################
-AUTHORS AND ACKNOWLEDGEMENTS
+## AUTHORS AND ACKNOWLEDGEMENTS
 
-Le Tran Anh Duc - Group 15 - Programming Paradigm 2020 - University of Twente
-Student number s2086948
-For more information or suggestions for improvement, email to letrananhduc@student.utwente.nl
+Le Tran Anh Duc - Group 15 - Programming Paradigm 2020 - University of Twene - Student number s2086948. For more information or suggestions for improvement, email to letrananhduc@student.utwente.nl
