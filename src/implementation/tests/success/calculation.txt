@@ -1,0 +1,15 @@
+
+
+santa make gift num a = 100;
+santa make gift num b = (a * 2 + 10 / 2) - (10 * 2 - 3);
+
+santa say b;
+
+santa make gift num c = 12 / 5;
+santa say c;
+
+santa make gift num d = (a + 20 + 10) / 2;
+santa say d;
+
+santa make gift num e = 10 / 2 * 5;
+santa say e;

@@ -5,12 +5,17 @@ import Text.ParserCombinators.Parsec.Language
 import qualified Text.Parsec.Token as Token
 import Data.Char
 
+-- ==========================================================================================================
+-- FILE DESCRIPTION
+-- * This file contains the language definition and base parser created from ParSec
+-- ==========================================================================================================
+
 languageDef =
    emptyDef { Token.commentStart    = "/*"
             , Token.commentEnd      = "*/"
             , Token.commentLine     = "//"
             , Token.identStart      = letter
-            , Token.identLetter     = letter
+            , Token.identLetter     = alphaNum
             , Token.reservedNames   = [ "santa make gift", "santa make special gift",
                                         "santa change gift",
                                         "santa check", "then he do", "otherwise he do",

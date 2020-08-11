@@ -6,6 +6,14 @@ import Data.Either
 import Text.ParserCombinators.Parsec
 import LangDef
 
+-- ==========================================================================================================
+-- FILE DESCRIPTION
+-- * This is the program test for the main parser. This test try to parse 4 different files in the same folder
+-- * and match it with the manually written Program tree to see if the results match. The corresponding files and
+-- * abstract syntax tree are shown in testList.
+-- * To run, call ':l tests/parser/prog/Program' and call 'run0', 'run1', 'run2', 'run3'
+-- ==========================================================================================================
+
 run0 = check $ testList!!0
 run1 = check $ testList!!1
 run2 = check $ testList!!2
@@ -36,14 +44,12 @@ varEx = Program [ VarDecStmt (VarDec Num "a" (NumExp 12))
 
 threadEx :: Program
 threadEx = Program [ LockStmt (LckCreate "lock")
-                   , ThreadStmt (ThrCreate "seasonOne" (Scope [ LockStmt (LckLock "lock")
-                                                              , LockStmt (LckUnlock "lock")
-                                                              ]))
-                   , ThreadStmt (ThrCreate "seasonTwo" (Scope [ LockStmt (LckLock "lock")
-                                                              , LockStmt (LckUnlock "lock")
-                                                              ]))
-                   , ThreadStmt (ThrStart "seasonOne")
-                   , ThreadStmt (ThrStart "seasonTwo")
+                   , ThreadStmt (ThrStart "seasonOne" (Scope [ LockStmt (LckLock "lock")
+                                                             , LockStmt (LckUnlock "lock")
+                                                             ]))
+                   , ThreadStmt (ThrStart "seasonTwo" (Scope [ LockStmt (LckLock "lock")
+                                                             , LockStmt (LckUnlock "lock")
+                                                             ]))
                    , ThreadStmt (ThrStop "seasonTwo")
                    , ThreadStmt (ThrStop "seasonOne")
                    ]
@@ -82,14 +88,13 @@ example = Program [ VarDecStmt (VarDec Num "a" (NumExp 12))
                                   (Scope [ VarReDecStmt (VarReDec "a" (NumExp 0)) ]))
                   , VarDecStmt (VarDec Num "sum" (NumExp 0))
                   , LockStmt (LckCreate "sumLock")
-                  , ThreadStmt (ThrCreate "addToSum" (Scope [ VarDecStmt (VarDec Num "i" (NumExp 0))
-                                                            , WheStmt (Where (CondExp (VarExp "i") L (NumExp 100))
-                                                                             (Scope [ LockStmt (LckLock "sumLock")
-                                                                                    , VarReDecStmt (VarReDec "sum" (NumCalc (VarExp "sum") AddOp (NumExp 5)))
-                                                                                    , LockStmt (LckUnlock "sumLock")
-                                                                                    ]))
-                                                            ]))
-                  , ThreadStmt (ThrStart "addToSum")
+                  , ThreadStmt (ThrStart "addToSum" (Scope [ VarDecStmt (VarDec Num "i" (NumExp 0))
+                                                           , WheStmt (Where (CondExp (VarExp "i") L (NumExp 100))
+                                                                            (Scope [ LockStmt (LckLock "sumLock")
+                                                                                   , VarReDecStmt (VarReDec "sum" (NumCalc (VarExp "sum") AddOp (NumExp 5)))
+                                                                                   , LockStmt (LckUnlock "sumLock")
+                                                                                   ]))
+                                                           ]))
                   , VarDecStmt (VarDec Num "i" (NumExp 0))
                   , WheStmt (Where (CondExp (VarExp "i") L (NumExp 100))
                                    (Scope [ LockStmt (LckLock "sumLock")

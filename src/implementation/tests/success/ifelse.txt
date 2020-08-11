@@ -1,0 +1,11 @@
+
+
+santa make gift bool x = 100 - 10 > 3;
+
+santa check (x) then he do {
+    santa make gift num a = 10;
+    santa say a;
+} otherwise he do {
+    santa make gift num b = 20;
+    santa say b;
+};

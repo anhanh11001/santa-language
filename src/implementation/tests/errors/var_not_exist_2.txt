@@ -1,0 +1,6 @@
+
+santa make gift num a = 10;     // This has to be special in order to be used by other thread
+
+christmas start seasonOne {
+    santa change gift a = 20;
+};

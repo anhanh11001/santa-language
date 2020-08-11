@@ -5,6 +5,12 @@ import Test.HUnit
 import Data.Either
 import Text.ParserCombinators.Parsec
 
+-- ==========================================================================================================
+-- FILE DESCRIPTION
+-- * This is the unit test for parser ordOp in BParser.hs
+-- * To run, call ':l tests/parser/unit/OrdOp' and call 'run'
+-- ==========================================================================================================
+
 check testName stream = TestLabel testName
                                    (TestCase (assertBool testName (isRight (parse ordOp "Error" stream))))
 

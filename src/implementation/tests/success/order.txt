@@ -1,0 +1,14 @@
+
+santa make gift bool a = true;
+santa make gift bool b = 12 > 10;
+santa make gift bool c = a && b && false;
+santa make gift bool d = (100 + 10) != 110;
+santa make gift num x = 12;
+
+santa make gift bool e = x <= 10;
+
+santa say a;
+santa say b;
+santa say c;
+santa say d;
+santa say e;

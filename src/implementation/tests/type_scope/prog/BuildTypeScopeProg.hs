@@ -6,6 +6,21 @@ import LangDef
 import TypeScope
 import BParser
 
+-- ==========================================================================================================
+-- FILE DESCRIPTION
+-- * This is the program test for the main type scope checking. This test try to compare the generated TypeScope
+-- * from prog.txt file with the manually created one.
+-- * To run, call ':l tests/type_scope/prog/BuildTypeScopeProg' and call 'run'
+-- ==========================================================================================================
+
+run = do prog <- readFile "tests/type_scope/prog/prog.txt"
+         let compiled = compile prog
+         let checked = buildTypeScopeProg compiled
+         let test = TestCase (assertBool "main_test" (cmpChildOnly checked progTypeScope))
+         runTestTT test
+
+-- ==========================================================================================================
+
 cmpChildOnly :: VarScope -> VarScope -> Bool
 cmpChildOnly (VarScope _ elem1) (VarScope _ elem2) = cmpChildOnly' elem1 elem2
 
@@ -26,10 +41,3 @@ progTypeScope = VarScope NullScope [ ElemVar "a" Num
                                                                    , ElemScope (VarScope NullScope [ElemVar "c" Num])
                                                                    ])
                                    ]
-
-run = do prog <- readFile "tests/type_scope/prog/prog.txt"
-         let compiled = compile prog
-         let checked = buildTypeScopeProg compiled
-         let test = TestCase (assertBool "main_test" (cmpChildOnly checked progTypeScope))
-         runTestTT test
-

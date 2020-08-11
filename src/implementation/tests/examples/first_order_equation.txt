@@ -1,6 +1,6 @@
-santa make gift num a = 2; // Changeable
-santa make gift num b = 3; // Changeable
-santa make gift num n = 7; // Changeable
+santa make gift num a = 2;
+santa make gift num b = 3;
+santa make gift num n = 7;
 
 santa make gift num i = 0;
 

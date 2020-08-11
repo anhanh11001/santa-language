@@ -5,6 +5,13 @@ import Test.HUnit
 import LangDef
 import TypeScope
 
+
+-- ==========================================================================================================
+-- FILE DESCRIPTION
+-- * This is the unit test for function getTypeV in TypeScope.hs
+-- * To run, call ':l tests/type_scope/unit/GetTypeV' and call 'run'
+-- ==========================================================================================================
+
 motherScope :: VarScope
 motherScope = VarScope NullScope [ ElemVar "a" Num
                                  , ElemVar "b" Boo

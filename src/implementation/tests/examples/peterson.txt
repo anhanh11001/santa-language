@@ -1,0 +1,23 @@
+santa make special gift bool a = true;
+santa make special gift bool b = true;
+santa make special gift num turn = 0;
+
+christmas start gateTwo {
+    santa change gift turn = 0;
+    santa go to factory when (a && (turn == 0)) {
+
+    };
+
+    santa make gift num checkVar = 1000;
+    santa say checkVar;
+    santa change gift b = false;
+};
+
+santa change gift turn = 1;
+santa go to factory when (b && (turn == 1)) {
+
+};
+
+santa make gift num checkVar = 1000;
+santa say checkVar;
+santa change gift a = false;

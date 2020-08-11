@@ -1,0 +1,8 @@
+
+santa make gift num a = 10;
+
+santa check (true) then he do {
+    santa make gift num b = 20;
+};
+
+santa say b;

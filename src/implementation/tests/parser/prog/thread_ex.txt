@@ -1,19 +1,16 @@
 santa lock create lock;
 
-christmas create seasonOne {
+christmas start seasonOne {
     santa lock lock;
 
     santa unlock lock;
 };
 
-christmas create seasonTwo {
+christmas start seasonTwo {
     santa lock lock;
 
     santa unlock lock;
 };
-
-christmas start seasonOne;
-christmas start seasonTwo;
 
 christmas stop seasonTwo;
 christmas stop seasonOne;

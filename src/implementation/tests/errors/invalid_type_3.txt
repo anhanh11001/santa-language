@@ -1,0 +1,4 @@
+
+santa make gift num a = 10;
+
+santa change gift a = false;

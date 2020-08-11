@@ -6,6 +6,12 @@ import Data.Either
 import Text.ParserCombinators.Parsec
 import LangDef
 
+-- ==========================================================================================================
+-- FILE DESCRIPTION
+-- * This is the unit test for parser thread and lock in BParser.hs
+-- * To run, call ':l tests/parser/unit/ThreadLock' and call 'run'
+-- ==========================================================================================================
+
 checkL testName stream res = TestLabel testName (TestCase (
   assertEqual testName (parse lock "Error" stream) (Right res)))
 
@@ -24,14 +30,11 @@ t3 = checkL "t3"
             "santa unlock ducLeTran"
             (LckUnlock "ducLeTran")
 
-t4 = checkT "t4"
-            "christmas create newGame {}"
-            (ThrCreate "newGame" (Scope []))
-t5 = checkT "t5"
-            "christmas start newGame"
-            (ThrStart "newGame")
-t6 = checkT "t6"
+t4 = checkT "t5"
+            "christmas start newGame {}"
+            (ThrStart "newGame" (Scope []))
+t5 = checkT "t6"
             "christmas stop newGame"
             (ThrStop "newGame")
 
-run = runTestTT $ TestList [ t1, t2, t3, t4, t5, t6 ]
+run = runTestTT $ TestList [ t1, t2, t3, t4, t5 ]

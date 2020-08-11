@@ -1,0 +1,25 @@
+santa make special gift num a = 0;
+
+santa lock create sumLock;
+
+christmas start sumOne {
+    santa lock sumLock;
+    santa make gift num i = 0;
+    santa go to factory when (i < 5) {
+        santa change gift a = a + i;
+        santa change gift i = i + 1;
+    };
+    santa unlock sumLock;
+};
+
+santa lock sumLock;
+santa make gift num i = 0;
+santa go to factory when (i < 5) {
+    santa change gift a = a + i;
+    santa change gift i = i + 1;
+};
+santa unlock sumLock;
+
+christmas stop sumOne;
+
+santa say a;

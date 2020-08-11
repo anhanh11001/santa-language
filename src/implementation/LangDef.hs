@@ -3,6 +3,11 @@ module LangDef where
 import Control.Applicative
 
 -- ==========================================================================================================
+-- FILE DESCRIPTION
+-- * This file contains the data class used for the language
+-- ==========================================================================================================
+
+-- ==========================================================================================================
 -- Data class of the language of the program
 -- ==========================================================================================================
 
@@ -59,13 +64,12 @@ data Expr = NumExp Integer                                              -- Numbe
           | CondExp Expr OrdOp Expr                                     -- Comparison: <, >, ==, >=, <=, !=
           | BooCalc Expr BoolOp Expr                                    -- Boolean logic: &&, ||
           | Parens Expr                                                 -- Inside parentheses: (<expr>)
-          | FuncCall String [Expr]
           deriving (Eq, Show)
 
 -- ==========================================================================================================
 -- Data class for operators and types
 -- ==========================================================================================================
-data VarType = Num | Boo | Char | Str | Lck | Thr deriving (Eq, Show)   -- Number, Boolean, Character, String, Lock, Thread
+data VarType = Num | Boo  | Lck | Thr deriving (Eq, Show)               -- Number, Boolean, Lock, Thread
 data BoolOp = AndOp | OrOp deriving (Eq, Show)                          -- &&, ||
 data OrdOp = L | M | E | LE | ME | NE deriving (Eq, Show)               -- <, >, ==, <=, >=, !=
 data CalcOp = AddOp | SubOp | Mult | Div deriving (Eq, Show)            -- +, -, *, /

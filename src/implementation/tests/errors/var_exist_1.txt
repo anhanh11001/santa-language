@@ -1,0 +1,4 @@
+santa make gift num a = 10;
+santa make gift num a = 20;
+
+santa say a;

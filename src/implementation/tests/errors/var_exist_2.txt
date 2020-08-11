@@ -1,0 +1,4 @@
+santa check (true) then he do {
+    santa make gift num a = 10;
+    santa make gift num a = 20;
+};

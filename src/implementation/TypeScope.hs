@@ -5,6 +5,13 @@ import Data.Maybe
 import Data.List
 
 -- ==========================================================================================================
+-- FILE DESCRIPTION
+-- * This file contains functions to check variable/scope of the generated Program tree
+-- * See function buildTypeScopeProg. If this function run successfully without error, it means that
+-- * the generated Program tree has passed the checking.
+-- ==========================================================================================================
+
+-- ==========================================================================================================
 -- TypeScope data class/data structure to store and check whether an AST is valid
 -- ==========================================================================================================
 data VarScope = VarScope VarScope [ElemVar]                                                      -- A scope can have a parent scope and store a list of elements inside
@@ -16,6 +23,9 @@ data ElemVar = ElemVar String VarType                                           
 -- ==========================================================================================================
 -- Functions to build the type scope data structure above for the program. If it fails to build, it means that the program has failed type/scope checking
 -- ==========================================================================================================
+
+checkTypeScope :: VarScope -> Bool                                                                -- Simple way to invoke the function to build and check type scope
+checkTypeScope scope = length (show scope) > 0                                                    -- If it doesn't raise error then it means that Program is valid
 
 buildTypeScopeProg :: Program -> VarScope
 buildTypeScopeProg (Program stmts) = buildTypeScope (VarScope NullScope []) stmts
@@ -32,7 +42,7 @@ buildTypeScopeThr scope (x:y) = buildTypeScope (processElemToScopeThr x scope) y
 -- Function to build to new type scope data structure from the current one for all statements of the program
 -- ==========================================================================================================
 
-processElemToScope :: Stmt -> VarScope -> VarScope
+processElemToScope :: Stmt -> VarScope -> VarScope                                            --
 processElemToScope stmt scope =
   case stmt of (VarDecStmt varDec) -> processVarDec varDec scope
                (VarDecSpecialStmt varDecSpecial) -> processVarDecSpecial varDecSpecial scope
@@ -170,6 +180,7 @@ getTypeV x scope = case x of (NumExp _) -> Num
                              (NumCalc ex1 _ ex2) -> isNum ex1 (isNum ex2 Num)
                              (BooCalc ex1 _ ex2) -> isBoo ex1 (isBoo ex2 Boo)
                              (CondExp ex1 _ ex2) -> isNum ex1 (isNum ex2 Boo)
+                             (Parens y) -> getTypeV y scope
                    where isNum x = valid (getTypeV x scope) Num
                          isBoo x = valid (getTypeV x scope) Boo
                          valid type1 type2 val = if (type1 == type2) then val else error ("Incorrect type" ++ (show x))

@@ -1,4 +1,3 @@
-
 santa make gift num fibNum = 10;
 santa make gift num a = 0;
 santa make gift num b = 1;

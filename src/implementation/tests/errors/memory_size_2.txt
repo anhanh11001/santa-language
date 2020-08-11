@@ -1,0 +1,5 @@
+santa make special gift num a = 10;
+santa make special gift num b = 10;
+santa make special gift num c = 10;
+santa make special gift num d = 10;
+santa make special gift num e = 10;

@@ -6,6 +6,12 @@ import Data.Either
 import Text.ParserCombinators.Parsec
 import LangDef
 
+-- ==========================================================================================================
+-- FILE DESCRIPTION
+-- * This is the unit test for parser varReDec in BParser.hs
+-- * To run, call ':l tests/parser/unit/VarReDec' and call 'run'
+-- ==========================================================================================================
+
 check testName stream res = TestLabel testName (TestCase (
   assertEqual testName (parse varReDec "Error" stream) (Right res)))
 

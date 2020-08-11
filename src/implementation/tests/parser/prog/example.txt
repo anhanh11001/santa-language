@@ -24,7 +24,7 @@ santa check (a >= 11) then he do {
 santa make gift num sum = 0;
 santa lock create sumLock;
 
-christmas create addToSum {
+christmas start addToSum {
     santa make gift num i = 0;
     santa go to factory when (i < 100) {
         santa lock sumLock;
@@ -32,7 +32,6 @@ christmas create addToSum {
         santa unlock sumLock;
     };
 };
-christmas start addToSum;
 
 santa make gift num i = 0;
 santa go to factory when (i < 100) {

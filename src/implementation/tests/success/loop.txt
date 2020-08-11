@@ -1,0 +1,10 @@
+
+santa make gift num a = 0;
+santa make gift num i = 0;
+
+santa go to factory when (i < 100) {
+    santa change gift a = a + i;
+    santa change gift i = i + 1;
+};
+
+santa say a;

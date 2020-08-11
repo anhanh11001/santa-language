@@ -1,0 +1,4 @@
+
+santa make gift num a = 10 / 0;
+
+santa say a;

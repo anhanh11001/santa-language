@@ -1,16 +1,36 @@
+santa make special gift num account = 0;
 
-santa make special gift a = 10;
-santa lock create sumLock;
+santa lock create newLock;
 
 christmas start seasonOne {
-    santa lock sumLock;
-    santa change gift a = a + 100;
-    santa unlock sumLock;
+    santa make gift num money = 0;
+    santa go to factory when (money < 10) {
+        santa lock newLock;
+        santa change gift account = account  + money;
+        santa unlock newLock;
+        santa change gift money = money + 1;
+    };
 };
 
-santa lock sumLock;
-santa change gift a = a + 200;
-santa unlock sumLock;
+christmas start seasonTwo {
+    santa make gift num money = 10;
+    santa go to factory when (money < 20) {
+        santa lock newLock;
+        santa change gift account = account  + money;
+        santa unlock newLock;
+        santa change gift money = money + 1;
+    };
+};
+
+santa make gift num money = 20;
+santa go to factory when (money < 30) {
+    santa lock newLock;
+    santa change gift account = account  + money;
+    santa unlock newLock;
+    santa change gift money = money + 1;
+};
+
+christmas stop seasonTwo;
 christmas stop seasonOne;
 
-santa say a; // This should call 310 ALWAYS
+santa say account;
