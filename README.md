@@ -1,7 +1,6 @@
 # SANTA
 
-Santa is a simple programming language created with Haskell. It is written by Le Tran Anh Duc for the final project
-of Programming Paradigm module in University of Twente.
+Santa is a simple procedural programming language created with Haskell. 
 
 ## FEATURES
 
